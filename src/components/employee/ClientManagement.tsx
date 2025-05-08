@@ -14,7 +14,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Search, UserPlus, Phone, Mail, Edit } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 type Client = {
   id: string;
@@ -97,9 +97,7 @@ export const ClientManagement: React.FC = () => {
 
   const handleAddClient = () => {
     if (!newClient.name || !newClient.phone || !newClient.email) {
-      toast({
-        variant: "destructive",
-        title: "Ошибка",
+      toast.error("Ошибка", {
         description: "Заполните все обязательные поля"
       });
       return;
@@ -110,7 +108,7 @@ export const ClientManagement: React.FC = () => {
       name: newClient.name,
       phone: newClient.phone,
       email: newClient.email,
-      status: newClient.status as "active" | "inactive" | "potential",
+      status: newClient.status as "active" | "inactive" | "potential" | "premium",
       segment: newClient.segment as "individual" | "business" | "premium"
     };
 
@@ -124,8 +122,7 @@ export const ClientManagement: React.FC = () => {
       segment: "individual"
     });
 
-    toast({
-      title: "Клиент добавлен",
+    toast.success("Клиент добавлен", {
       description: `${newClientWithId.name} успешно добавлен в базу`
     });
   };
@@ -218,8 +215,7 @@ export const ClientManagement: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => {
-                        toast({
-                          title: "Звонок клиенту",
+                        toast.info("Звонок клиенту", {
                           description: `Набираем номер ${client.phone}`
                         });
                       }}
@@ -230,8 +226,7 @@ export const ClientManagement: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => {
-                        toast({
-                          title: "Отправка email",
+                        toast.info("Отправка email", {
                           description: `Составляем письмо для ${client.email}`
                         });
                       }}
@@ -242,8 +237,7 @@ export const ClientManagement: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => {
-                        toast({
-                          title: "Редактирование",
+                        toast.info("Редактирование", {
                           description: "Функция в разработке"
                         });
                       }}

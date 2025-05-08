@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const EmployeeManagement: React.FC = () => {
@@ -30,9 +30,7 @@ export const EmployeeManagement: React.FC = () => {
 
   const handleAddEmployee = () => {
     if (!newEmployee.username || !newEmployee.name) {
-      toast({
-        variant: "destructive",
-        title: "Ошибка",
+      toast.error("Ошибка", {
         description: "Заполните все обязательные поля",
       });
       return;
@@ -94,8 +92,7 @@ export const EmployeeManagement: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => {
-                        toast({
-                          title: "Редактирование профиля",
+                        toast.info("Редактирование профиля", {
                           description: "Функция находится в разработке",
                         });
                       }}

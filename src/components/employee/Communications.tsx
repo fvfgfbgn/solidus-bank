@@ -1,434 +1,367 @@
 
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Phone, MessageCircle, Video, Send, UserPlus, Search } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Phone, PhoneForwarded, PhoneOff, MessageSquare, Send, Search, Clock } from "lucide-react";
+import { toast } from "sonner";
 
 type Message = {
   id: string;
   sender: string;
   content: string;
   timestamp: Date;
-  read: boolean;
-  clientId: string;
+  isFromClient: boolean;
 };
 
 type Call = {
   id: string;
-  clientId: string;
   clientName: string;
-  startTime: Date;
-  duration: number | null; // in seconds, null if ongoing
-  type: "incoming" | "outgoing";
-  status: "missed" | "completed" | "ongoing";
+  clientPhone: string;
+  duration: string;
+  timestamp: Date;
+  status: "completed" | "missed" | "upcoming";
 };
 
 export const Communications: React.FC = () => {
-  const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("messages");
-  const [clients, setClients] = useState([
-    { id: "client-1", name: "Алексей Иванов" },
-    { id: "client-2", name: "ООО 'ТехноСтрой'" },
-    { id: "client-3", name: "Елена Петрова" },
-    { id: "client-4", name: "Сергей Смирнов" },
-  ]);
-  const [selectedClient, setSelectedClient] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "msg-1",
-      sender: "client",
-      content: "Здравствуйте, подскажите пожалуйста по вопросу открытия счета.",
-      timestamp: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
-      read: true,
-      clientId: "client-1"
-    },
-    {
-      id: "msg-2",
-      sender: "employee",
-      content: "Добрый день! Конечно, что именно вас интересует?",
-      timestamp: new Date(new Date().getTime() - 23.5 * 60 * 60 * 1000),
-      read: true,
-      clientId: "client-1"
-    },
-    {
-      id: "msg-3",
-      sender: "client",
-      content: "Какие документы потребуются для открытия расчётного счёта для ООО?",
-      timestamp: new Date(new Date().getTime() - 2 * 60 * 60 * 1000),
-      read: false,
-      clientId: "client-1"
-    },
-    {
-      id: "msg-4",
-      sender: "client",
-      content: "Добрый день, нужна консультация по кредитным продуктам.",
-      timestamp: new Date(new Date().getTime() - 5 * 60 * 60 * 1000),
-      read: false,
-      clientId: "client-3"
-    },
-  ]);
-  const [newMessage, setNewMessage] = useState("");
-  const [calls, setCalls] = useState<Call[]>([
-    {
-      id: "call-1",
-      clientId: "client-1",
-      clientName: "Алексей Иванов",
-      startTime: new Date(new Date().getTime() - 2 * 60 * 60 * 1000),
-      duration: 185,
-      type: "incoming",
-      status: "completed"
-    },
-    {
-      id: "call-2",
-      clientId: "client-2",
-      clientName: "ООО 'ТехноСтрой'",
-      startTime: new Date(new Date().getTime() - 1 * 60 * 60 * 1000),
-      duration: 312,
-      type: "outgoing",
-      status: "completed"
-    },
-    {
-      id: "call-3",
-      clientId: "client-4",
-      clientName: "Сергей Смирнов",
-      startTime: new Date(new Date().getTime() - 30 * 60 * 1000),
-      duration: null,
-      type: "incoming",
-      status: "missed"
-    },
-  ]);
-  const [isNewCallModalOpen, setIsNewCallModalOpen] = useState(false);
-  const [callClient, setCallClient] = useState("");
-
-  // Filter messages by selected client
-  const filteredMessages = selectedClient 
-    ? messages.filter(msg => msg.clientId === selectedClient) 
-    : [];
-
-  // Get unread messages count by client
-  const getUnreadCount = (clientId: string) => {
-    return messages.filter(msg => msg.clientId === clientId && msg.sender === "client" && !msg.read).length;
-  };
-
-  // Format timestamp to readable time
-  const formatTime = (timestamp: Date) => {
-    return timestamp.toLocaleTimeString("ru-RU", {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-  };
-
-  // Format call duration
-  const formatDuration = (seconds: number | null) => {
-    if (seconds === null) return "В процессе";
-    
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    
-    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-  };
-
-  // Handle sending a new message
+  const [activeTab, setActiveTab] = useState("calls");
+  const [message, setMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeChat, setActiveChat] = useState<string | null>("client-1");
+  
+  // Mock clients
+  const clients = [
+    { id: "client-1", name: "Алексей Иванов", lastMessage: "Добрый день! У меня вопрос по кредиту.", unread: 1 },
+    { id: "client-2", name: "ООО 'ТехноСтрой'", lastMessage: "Спасибо за информацию.", unread: 0 },
+    { id: "client-3", name: "Елена Петрова", lastMessage: "Когда будет готова моя карта?", unread: 3 },
+    { id: "client-4", name: "Сергей Смирнов", lastMessage: "Нужна консультация по вкладам.", unread: 0 },
+  ];
+  
+  // Mock messages for active chat
+  const [messages, setMessages] = useState<Record<string, Message[]>>({
+    "client-1": [
+      { id: "msg-1", sender: "Алексей Иванов", content: "Добрый день! У меня вопрос по кредиту.", timestamp: new Date(Date.now() - 3600000), isFromClient: true },
+      { id: "msg-2", sender: "Вы", content: "Добрый день! Какой именно вопрос вас интересует?", timestamp: new Date(Date.now() - 3500000), isFromClient: false },
+      { id: "msg-3", sender: "Алексей Иванов", content: "Какие документы нужны для оформления ипотеки?", timestamp: new Date(Date.now() - 3400000), isFromClient: true },
+    ],
+    "client-2": [
+      { id: "msg-4", sender: "ООО 'ТехноСтрой'", content: "Добрый день! Нам интересует расчётно-кассовое обслуживание для бизнеса.", timestamp: new Date(Date.now() - 86400000), isFromClient: true },
+      { id: "msg-5", sender: "Вы", content: "Добрый день! Я могу рассказать о наших тарифах для юридических лиц.", timestamp: new Date(Date.now() - 86000000), isFromClient: false },
+      { id: "msg-6", sender: "ООО 'ТехноСтрой'", content: "Спасибо за информацию.", timestamp: new Date(Date.now() - 85000000), isFromClient: true },
+    ],
+    "client-3": [
+      { id: "msg-7", sender: "Елена Петрова", content: "Здравствуйте. Я подала заявку на кредитную карту неделю назад.", timestamp: new Date(Date.now() - 172800000), isFromClient: true },
+      { id: "msg-8", sender: "Вы", content: "Добрый день! Сейчас проверю статус вашей заявки.", timestamp: new Date(Date.now() - 172700000), isFromClient: false },
+      { id: "msg-9", sender: "Елена Петрова", content: "Когда будет готова моя карта?", timestamp: new Date(Date.now() - 172600000), isFromClient: true },
+      { id: "msg-10", sender: "Елена Петрова", content: "Мне очень срочно нужно знать примерные сроки.", timestamp: new Date(Date.now() - 172500000), isFromClient: true },
+      { id: "msg-11", sender: "Елена Петрова", content: "Вы можете ответить?", timestamp: new Date(Date.now() - 172400000), isFromClient: true },
+    ],
+  });
+  
+  // Mock calls
+  const calls: Call[] = [
+    { id: "call-1", clientName: "Алексей Иванов", clientPhone: "+7 (900) 123-4567", duration: "5:23", timestamp: new Date(Date.now() - 1800000), status: "completed" },
+    { id: "call-2", clientName: "ООО 'ТехноСтрой'", clientPhone: "+7 (495) 765-4321", duration: "12:08", timestamp: new Date(Date.now() - 7200000), status: "completed" },
+    { id: "call-3", clientName: "Елена Петрова", clientPhone: "+7 (912) 555-7890", duration: "", timestamp: new Date(Date.now() - 43200000), status: "missed" },
+    { id: "call-4", clientName: "Новый клиент", clientPhone: "+7 (999) 888-7777", duration: "", timestamp: new Date(Date.now() + 3600000), status: "upcoming" },
+  ];
+  
   const handleSendMessage = () => {
-    if (!newMessage.trim() || !selectedClient) return;
+    if (!message.trim() || !activeChat) return;
     
-    const newMsg: Message = {
+    const newMessage: Message = {
       id: `msg-${Date.now()}`,
-      sender: "employee",
-      content: newMessage,
+      sender: "Вы",
+      content: message,
       timestamp: new Date(),
-      read: true,
-      clientId: selectedClient
+      isFromClient: false,
     };
     
-    setMessages(prev => [...prev, newMsg]);
-    setNewMessage("");
+    setMessages((prev) => ({
+      ...prev,
+      [activeChat]: [...(prev[activeChat] || []), newMessage],
+    }));
     
-    toast({
-      title: "Сообщение отправлено",
-      description: `Отправлено клиенту ${clients.find(c => c.id === selectedClient)?.name}`
-    });
-  };
-
-  // Handle making a new call
-  const handleMakeCall = () => {
-    if (!callClient) {
-      toast({
-        variant: "destructive",
-        title: "Ошибка",
-        description: "Выберите клиента для звонка"
-      });
-      return;
-    }
+    setMessage("");
     
-    const client = clients.find(c => c.id === callClient);
-    
-    if (!client) return;
-    
-    const newCall: Call = {
-      id: `call-${Date.now()}`,
-      clientId: callClient,
-      clientName: client.name,
-      startTime: new Date(),
-      duration: null,
-      type: "outgoing",
-      status: "ongoing"
-    };
-    
-    setCalls(prev => [...prev, newCall]);
-    setIsNewCallModalOpen(false);
-    setCallClient("");
-    
-    toast({
-      title: "Звонок начат",
-      description: `Звоним клиенту ${client.name}`
-    });
-    
-    // Simulate call completion after random time
+    // Simulate client response after a delay
     setTimeout(() => {
-      setCalls(prev => prev.map(call => 
-        call.id === newCall.id 
-          ? { ...call, duration: Math.floor(30 + Math.random() * 300), status: "completed" }
-          : call
-      ));
+      const clientName = clients.find(c => c.id === activeChat)?.name || "Клиент";
+      const responses = [
+        "Спасибо за информацию!",
+        "Хорошо, буду ждать.",
+        "Понятно, а какие еще есть варианты?",
+        "Когда можно подойти в офис для оформления?",
+      ];
       
-      toast({
-        title: "Звонок завершен",
-        description: `Звонок с ${client.name} завершен`
-      });
-    }, 5000);
+      const clientResponse: Message = {
+        id: `msg-${Date.now() + 1}`,
+        sender: clientName,
+        content: responses[Math.floor(Math.random() * responses.length)],
+        timestamp: new Date(),
+        isFromClient: true,
+      };
+      
+      setMessages((prev) => ({
+        ...prev,
+        [activeChat]: [...(prev[activeChat] || []), clientResponse],
+      }));
+    }, 3000);
   };
-
-  // Mark messages as read when a client is selected
-  useEffect(() => {
-    if (selectedClient) {
-      setMessages(prev => prev.map(msg => 
-        msg.clientId === selectedClient && !msg.read
-          ? { ...msg, read: true }
-          : msg
-      ));
+  
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString("ru-RU", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+  
+  const filteredClients = clients.filter(client => 
+    client.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  
+  const handleCall = (phone: string, name: string) => {
+    toast.info("Звонок", {
+      description: `Выполняется звонок на номер ${phone} (${name})`,
+    });
+  };
+  
+  const getCallStatusIcon = (status: Call["status"]) => {
+    switch (status) {
+      case "completed":
+        return <Phone className="h-4 w-4 text-green-500" />;
+      case "missed":
+        return <PhoneOff className="h-4 w-4 text-red-500" />;
+      case "upcoming":
+        return <Clock className="h-4 w-4 text-blue-500" />;
     }
-  }, [selectedClient]);
+  };
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <Card className="md:col-span-1">
-        <CardHeader>
-          <CardTitle>Контакты</CardTitle>
-          <CardDescription>Выберите клиента для коммуникации</CardDescription>
-          <div className="relative mt-2">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Поиск клиента..." className="pl-8" />
+    <Card className="h-[calc(100vh-12rem)]">
+      <CardHeader>
+        <CardTitle>Коммуникации с клиентами</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
+          <div className="border-b px-4">
+            <TabsList className="h-10">
+              <TabsTrigger value="chats" className="data-[state=active]:bg-background">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Чаты
+              </TabsTrigger>
+              <TabsTrigger value="calls" className="data-[state=active]:bg-background">
+                <Phone className="h-4 w-4 mr-2" />
+                Звонки
+              </TabsTrigger>
+            </TabsList>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {clients.map(client => (
-              <Button
-                key={client.id}
-                variant={selectedClient === client.id ? "default" : "outline"}
-                className="w-full justify-start"
-                onClick={() => setSelectedClient(client.id)}
-              >
-                <span className="truncate">{client.name}</span>
-                {getUnreadCount(client.id) > 0 && (
-                  <Badge variant="destructive" className="ml-auto">
-                    {getUnreadCount(client.id)}
-                  </Badge>
-                )}
-              </Button>
-            ))}
-            <Button 
-              variant="ghost" 
-              className="w-full mt-4"
-              onClick={() => toast({
-                title: "Добавление клиента",
-                description: "Функция в разработке"
-              })}
-            >
-              <UserPlus className="h-4 w-4 mr-2" />
-              Добавить клиента
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="md:col-span-2">
-        <CardHeader>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <div className="flex justify-between items-center">
-              <TabsList>
-                <TabsTrigger value="messages">
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Сообщения
-                </TabsTrigger>
-                <TabsTrigger value="calls">
-                  <Phone className="h-4 w-4 mr-2" />
-                  Звонки
-                </TabsTrigger>
-              </TabsList>
-              
-              <div>
-                {activeTab === "messages" ? (
-                  <Button 
-                    size="sm" 
-                    disabled={!selectedClient}
-                    onClick={() => toast({
-                      title: "Видео-консультация",
-                      description: "Функция в разработке"
-                    })}
-                  >
-                    <Video className="h-4 w-4 mr-2" />
-                    Видео-консультация
-                  </Button>
-                ) : (
-                  <Button 
-                    size="sm"
-                    onClick={() => setIsNewCallModalOpen(true)}
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Новый звонок
-                  </Button>
-                )}
+          
+          <TabsContent value="chats" className="h-[calc(100%-2.5rem)] m-0">
+            <div className="flex h-full border-t">
+              {/* Sidebar with clients */}
+              <div className="w-1/3 border-r h-full flex flex-col">
+                <div className="p-3 border-b">
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Поиск клиентов..."
+                      className="pl-8"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="flex-1 overflow-auto">
+                  {filteredClients.map((client) => (
+                    <div
+                      key={client.id}
+                      className={`flex items-center gap-3 p-3 cursor-pointer hover:bg-muted/50 ${
+                        activeChat === client.id ? "bg-muted" : ""
+                      }`}
+                      onClick={() => setActiveChat(client.id)}
+                    >
+                      <Avatar>
+                        <AvatarFallback>{client.name[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium truncate">{client.name}</span>
+                          {client.unread > 0 && (
+                            <span className="bg-primary text-primary-foreground rounded-full h-5 w-5 flex items-center justify-center text-xs">
+                              {client.unread}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-muted-foreground text-sm truncate">
+                          {client.lastMessage}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          </Tabs>
-        </CardHeader>
-        <CardContent>
-          <TabsContent value="messages" className="mt-0">
-            {selectedClient ? (
-              <div className="flex flex-col h-[400px]">
-                <div className="flex-grow overflow-y-auto mb-4 space-y-4 p-2">
-                  {filteredMessages.length > 0 ? (
-                    filteredMessages.map(msg => (
-                      <div
-                        key={msg.id}
-                        className={`flex ${msg.sender === "employee" ? "justify-end" : "justify-start"}`}
+              
+              {/* Chat area */}
+              <div className="flex-1 flex flex-col h-full">
+                {activeChat ? (
+                  <>
+                    <div className="p-3 border-b flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <Avatar>
+                          <AvatarFallback>
+                            {clients.find(c => c.id === activeChat)?.name[0] || "К"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium">
+                          {clients.find(c => c.id === activeChat)?.name || "Клиент"}
+                        </span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => 
+                          handleCall("+7 (999) 123-4567", clients.find(c => c.id === activeChat)?.name || "Клиент")
+                        }
                       >
+                        <Phone className="h-4 w-4 mr-2" />
+                        Позвонить
+                      </Button>
+                    </div>
+                    <div className="flex-1 overflow-auto p-4 space-y-4">
+                      {messages[activeChat]?.map((msg) => (
                         <div
-                          className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                            msg.sender === "employee"
-                              ? "bg-solidus-steel-blue text-white"
-                              : "bg-gray-100"
+                          key={msg.id}
+                          className={`flex ${
+                            msg.isFromClient ? "justify-start" : "justify-end"
                           }`}
                         >
-                          <p>{msg.content}</p>
-                          <p className={`text-xs mt-1 ${
-                            msg.sender === "employee" ? "text-blue-100" : "text-gray-500"
-                          }`}>
-                            {formatTime(msg.timestamp)}
-                          </p>
+                          <div
+                            className={`max-w-[70%] p-3 rounded-lg ${
+                              msg.isFromClient
+                                ? "bg-muted"
+                                : "bg-primary text-primary-foreground"
+                            }`}
+                          >
+                            <p>{msg.content}</p>
+                            <p className={`text-xs mt-1 ${msg.isFromClient ? "text-muted-foreground" : "text-primary-foreground/70"}`}>
+                              {formatTime(msg.timestamp)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-muted-foreground">
-                      Нет сообщений с этим клиентом
+                      ))}
                     </div>
-                  )}
-                </div>
-                <div className="flex gap-2">
-                  <Textarea
-                    placeholder="Введите сообщение..."
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    className="resize-none"
-                  />
-                  <Button onClick={handleSendMessage}>
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
+                    <div className="p-3 border-t flex gap-2">
+                      <Textarea
+                        placeholder="Введите сообщение..."
+                        className="min-h-[2.5rem] max-h-[10rem] resize-none"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                          }
+                        }}
+                      />
+                      <Button
+                        className="h-full aspect-square"
+                        onClick={handleSendMessage}
+                        disabled={!message.trim()}
+                      >
+                        <Send className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-center h-full text-muted-foreground">
+                    Выберите клиента для начала общения
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="flex items-center justify-center h-[400px] text-muted-foreground">
-                Выберите клиента для просмотра сообщений
-              </div>
-            )}
+            </div>
           </TabsContent>
           
-          <TabsContent value="calls" className="mt-0">
-            <div className="rounded-md border overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="text-left py-2 px-4">Клиент</th>
-                    <th className="text-left py-2 px-4">Время</th>
-                    <th className="text-left py-2 px-4">Тип</th>
-                    <th className="text-left py-2 px-4">Длительность</th>
-                    <th className="text-left py-2 px-4">Статус</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {calls.length > 0 ? (
-                    calls.map((call) => (
-                      <tr key={call.id} className="border-b hover:bg-muted/50">
-                        <td className="py-3 px-4 font-medium">{call.clientName}</td>
-                        <td className="py-3 px-4">{formatTime(call.startTime)}</td>
-                        <td className="py-3 px-4">
-                          {call.type === "incoming" ? "Входящий" : "Исходящий"}
-                        </td>
-                        <td className="py-3 px-4">{formatDuration(call.duration)}</td>
-                        <td className="py-3 px-4">
-                          {call.status === "completed" && <Badge variant="outline" className="bg-green-100 text-green-800">Завершен</Badge>}
-                          {call.status === "missed" && <Badge variant="outline" className="bg-red-100 text-red-800">Пропущен</Badge>}
-                          {call.status === "ongoing" && <Badge variant="outline" className="bg-blue-100 text-blue-800">В процессе</Badge>}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={5} className="py-8 text-center text-muted-foreground">
-                        Нет записей звонков
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+          <TabsContent value="calls" className="h-[calc(100%-2.5rem)] m-0 p-4">
+            <div className="space-y-6">
+              <div>
+                <h3 className="font-medium mb-3">Предстоящие звонки</h3>
+                {calls.filter(call => call.status === "upcoming").map(call => (
+                  <div
+                    key={call.id}
+                    className="flex items-center justify-between border-b py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      {getCallStatusIcon(call.status)}
+                      <div>
+                        <p className="font-medium">{call.clientName}</p>
+                        <p className="text-sm text-muted-foreground">{call.clientPhone}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(call.timestamp).toLocaleTimeString("ru-RU", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      <Button size="sm" onClick={() => handleCall(call.clientPhone, call.clientName)}>
+                        <PhoneForwarded className="h-4 w-4 mr-2" />
+                        Позвонить
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                {calls.filter(call => call.status === "upcoming").length === 0 && (
+                  <p className="text-muted-foreground py-2">Нет предстоящих звонков</p>
+                )}
+              </div>
+              
+              <div>
+                <h3 className="font-medium mb-3">История звонков</h3>
+                {calls.filter(call => call.status !== "upcoming").map(call => (
+                  <div
+                    key={call.id}
+                    className="flex items-center justify-between border-b py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      {getCallStatusIcon(call.status)}
+                      <div>
+                        <p className="font-medium">{call.clientName}</p>
+                        <p className="text-sm text-muted-foreground">{call.clientPhone}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                      {call.status === "completed" && <span>{call.duration}</span>}
+                      <span>
+                        {new Date(call.timestamp).toLocaleDateString("ru-RU", {
+                          day: "2-digit",
+                          month: "2-digit",
+                        })}
+                        {", "}
+                        {new Date(call.timestamp).toLocaleTimeString("ru-RU", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleCall(call.clientPhone, call.clientName)}
+                      >
+                        <PhoneForwarded className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </TabsContent>
-        </CardContent>
-      </Card>
-
-      <Dialog open={isNewCallModalOpen} onOpenChange={setIsNewCallModalOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Новый звонок</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="client">Выберите клиента</Label>
-              <select
-                id="client"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                value={callClient}
-                onChange={(e) => setCallClient(e.target.value)}
-              >
-                <option value="">Выберите клиента</option>
-                {clients.map(client => (
-                  <option key={client.id} value={client.id}>{client.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsNewCallModalOpen(false)}>
-              Отмена
-            </Button>
-            <Button onClick={handleMakeCall}>
-              <Phone className="h-4 w-4 mr-2" />
-              Позвонить
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };

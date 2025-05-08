@@ -83,15 +83,15 @@ export default function Index() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {user?.role === "admin" ? (
                   <>
-                    <Link to="/admin/employees" className="block p-6 rounded-lg border hover:shadow-md transition-shadow">
+                    <Link to="/admin" className="block p-6 rounded-lg border hover:shadow-md transition-shadow">
                       <h3 className="font-bold text-xl mb-2">Сотрудники</h3>
                       <p className="text-muted-foreground">Управление сотрудниками банка</p>
                     </Link>
-                    <Link to="/admin/activity" className="block p-6 rounded-lg border hover:shadow-md transition-shadow">
+                    <Link to="/admin" className="block p-6 rounded-lg border hover:shadow-md transition-shadow">
                       <h3 className="font-bold text-xl mb-2">Активность</h3>
                       <p className="text-muted-foreground">Мониторинг действий сотрудников</p>
                     </Link>
-                    <Link to="/admin/secret" className="block p-6 rounded-lg border hover:shadow-md transition-shadow">
+                    <Link to="/admin" className="block p-6 rounded-lg border hover:shadow-md transition-shadow">
                       <h3 className="font-bold text-xl mb-2">Секретная информация</h3>
                       <p className="text-muted-foreground">Доступ к защищенной информации</p>
                     </Link>
@@ -102,12 +102,12 @@ export default function Index() {
                       <h3 className="font-bold text-xl mb-2">Клиенты</h3>
                       <p className="text-muted-foreground">Управление базой клиентов</p>
                     </Link>
-                    <Link to="/communications" className="block p-6 rounded-lg border hover:shadow-md transition-shadow">
+                    <Link to="/clients" className="block p-6 rounded-lg border hover:shadow-md transition-shadow">
                       <h3 className="font-bold text-xl mb-2">Коммуникации</h3>
                       <p className="text-muted-foreground">Звонки и консультации</p>
                     </Link>
                     {user?.canAccessSecretData && (
-                      <Link to="/secret" className="block p-6 rounded-lg border hover:shadow-md transition-shadow">
+                      <Link to="/clients" className="block p-6 rounded-lg border hover:shadow-md transition-shadow">
                         <h3 className="font-bold text-xl mb-2">Секретная информация</h3>
                         <p className="text-muted-foreground">Доступ к защищенной информации</p>
                       </Link>
