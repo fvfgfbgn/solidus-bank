@@ -21,7 +21,7 @@ type Client = {
   name: string;
   phone: string;
   email: string;
-  status: "active" | "inactive" | "potential";
+  status: "active" | "inactive" | "potential" | "premium";
   segment: "individual" | "business" | "premium";
 };
 
