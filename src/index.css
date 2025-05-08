@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -49,6 +50,11 @@
     --sidebar-border: 220 13% 91%;
 
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Custom Solidus Bank colors */
+    --solidus-dark-slate: 180 13% 25%; /* #2F4F4F - dark slate gray */
+    --solidus-steel-blue: 207 44% 49%; /* #4682B4 - steel blue */
+    --solidus-platinum: 60 3% 89%;     /* #E5E4E2 - platinum */
   }
 
   .dark {
@@ -87,6 +93,11 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Custom Solidus Bank colors - dark mode */
+    --solidus-dark-slate: 180 13% 35%; /* Lighter for dark mode */
+    --solidus-steel-blue: 207 44% 60%; /* Brighter for dark mode */
+    --solidus-platinum: 60 3% 75%;     /* Darker for dark mode */
   }
 }
 
@@ -97,5 +108,28 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Solidus brand gradient */
+  .solidus-gradient {
+    background: linear-gradient(135deg, hsl(var(--solidus-dark-slate)) 0%, hsl(var(--solidus-steel-blue)) 100%);
+  }
+  
+  /* Animate fade in for components */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
