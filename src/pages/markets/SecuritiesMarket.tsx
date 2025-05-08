@@ -156,6 +156,12 @@ export default function SecuritiesMarket() {
   const [bondType, setBondType] = useState<"government" | "corporate">("government");
   const [timeframe, setTimeframe] = useState("1y");
 
+  // Create a type-safe handler function for the bondType Tabs
+  const handleBondTypeChange = (value: string) => {
+    // Type assertion here since we know the value will only be "government" or "corporate"
+    setBondType(value as "government" | "corporate");
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -174,7 +180,7 @@ export default function SecuritiesMarket() {
             
             <TabsContent value="bonds">
               <div className="mb-8">
-                <Tabs value={bondType} onValueChange={setBondType}>
+                <Tabs value={bondType} onValueChange={handleBondTypeChange}>
                   <TabsList>
                     <TabsTrigger value="government">Государственные облигации</TabsTrigger>
                     <TabsTrigger value="corporate">Корпоративные облигации</TabsTrigger>
