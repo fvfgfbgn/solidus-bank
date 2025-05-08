@@ -54,8 +54,31 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
+// Define interfaces for our bond data types
+interface GovBondData {
+  id: string;
+  name: string;
+  maturity: string;
+  coupon: number;
+  yield: number;
+  price: number;
+  change: number;
+}
+
+interface CorpBondData {
+  id: string;
+  name: string;
+  issuer: string;
+  rating: string;
+  maturity: string;
+  coupon: number;
+  yield: number;
+  price: number;
+  change: number;
+}
+
 // Sample government bonds data
-const govBondsData = [
+const govBondsData: GovBondData[] = [
   { id: "ОФЗ 26230", name: "ОФЗ-ПД 26230", maturity: "16.03.2039", coupon: 7.70, yield: 9.05, price: 89.79, change: -0.15 },
   { id: "ОФЗ 26223", name: "ОФЗ-ПД 26223", maturity: "28.02.2024", coupon: 6.50, yield: 8.98, price: 99.15, change: 0.03 },
   { id: "ОФЗ 26222", name: "ОФЗ-ПД 26222", maturity: "16.10.2024", coupon: 7.10, yield: 8.92, price: 98.27, change: -0.05 },
@@ -67,7 +90,7 @@ const govBondsData = [
 ];
 
 // Sample corporate bonds data
-const corpBondsData = [
+const corpBondsData: CorpBondData[] = [
   { id: "Сбер-001P-SBER20", name: "Сбер БО-001P-SBER20", issuer: "Сбербанк", rating: "AAA(RU)", maturity: "12.05.2026", coupon: 7.85, yield: 8.92, price: 99.05, change: 0.12 },
   { id: "ГТЛК-001P-19", name: "ГТЛК-001P-19", issuer: "ГТЛК", rating: "AA+(RU)", maturity: "22.03.2027", coupon: 8.10, yield: 9.15, price: 97.89, change: -0.05 },
   { id: "РЖД-001P-20R", name: "РЖД-001P-20R", issuer: "РЖД", rating: "AAA(RU)", maturity: "02.06.2028", coupon: 7.90, yield: 9.08, price: 96.74, change: 0.02 },
@@ -130,7 +153,7 @@ const marketIndicators = [
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d'];
 
 export default function SecuritiesMarket() {
-  const [bondType, setBondType] = useState("government");
+  const [bondType, setBondType] = useState<"government" | "corporate">("government");
   const [timeframe, setTimeframe] = useState("1y");
 
   return (
@@ -184,22 +207,37 @@ export default function SecuritiesMarket() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {(bondType === "government" ? govBondsData : corpBondsData).map((bond) => (
-                          <TableRow key={bond.id}>
-                            <TableCell className="font-medium">{bond.name}</TableCell>
-                            {bondType === "corporate" && <TableCell>{bond.issuer}</TableCell>}
-                            {bondType === "corporate" && <TableCell>{bond.rating}</TableCell>}
-                            <TableCell>{bond.maturity}</TableCell>
-                            <TableCell>{bond.coupon.toFixed(2)}</TableCell>
-                            <TableCell>{bond.yield.toFixed(2)}</TableCell>
-                            <TableCell>{bond.price.toFixed(2)}</TableCell>
-                            <TableCell>
-                              <span className={bond.change > 0 ? "text-green-500" : bond.change < 0 ? "text-red-500" : ""}>
-                                {bond.change > 0 ? "+" : ""}{bond.change.toFixed(2)}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {bondType === "government" 
+                          ? govBondsData.map((bond) => (
+                            <TableRow key={bond.id}>
+                              <TableCell className="font-medium">{bond.name}</TableCell>
+                              <TableCell>{bond.maturity}</TableCell>
+                              <TableCell>{bond.coupon.toFixed(2)}</TableCell>
+                              <TableCell>{bond.yield.toFixed(2)}</TableCell>
+                              <TableCell>{bond.price.toFixed(2)}</TableCell>
+                              <TableCell>
+                                <span className={bond.change > 0 ? "text-green-500" : bond.change < 0 ? "text-red-500" : ""}>
+                                  {bond.change > 0 ? "+" : ""}{bond.change.toFixed(2)}
+                                </span>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                          : corpBondsData.map((bond) => (
+                            <TableRow key={bond.id}>
+                              <TableCell className="font-medium">{bond.name}</TableCell>
+                              <TableCell>{bond.issuer}</TableCell>
+                              <TableCell>{bond.rating}</TableCell>
+                              <TableCell>{bond.maturity}</TableCell>
+                              <TableCell>{bond.coupon.toFixed(2)}</TableCell>
+                              <TableCell>{bond.yield.toFixed(2)}</TableCell>
+                              <TableCell>{bond.price.toFixed(2)}</TableCell>
+                              <TableCell>
+                                <span className={bond.change > 0 ? "text-green-500" : bond.change < 0 ? "text-red-500" : ""}>
+                                  {bond.change > 0 ? "+" : ""}{bond.change.toFixed(2)}
+                                </span>
+                              </TableCell>
+                            </TableRow>
+                          ))}
                       </TableBody>
                     </Table>
                   </div>
