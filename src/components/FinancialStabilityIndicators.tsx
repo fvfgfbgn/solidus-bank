@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { InfoCircle } from "lucide-react";
+import { Info } from "lucide-react";
 
 type FinancialIndicator = {
   id: string;
@@ -178,7 +178,7 @@ export const FinancialStabilityIndicators: React.FC = () => {
                   <span>0{indicator.unit}</span>
                   <div className="flex items-center gap-1">
                     <span>Целевой диапазон: {indicator.targetMin}-{indicator.targetMax}{indicator.unit}</span>
-                    <InfoCircle className="h-3 w-3" />
+                    <Info className="h-3 w-3" />
                   </div>
                   <span>{indicator.targetMax * 2}{indicator.unit}</span>
                 </div>
