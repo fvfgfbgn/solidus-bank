@@ -94,21 +94,20 @@ export const Header = () => {
             <MainNavigation />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-solidus-platinum"
+              variant="outline" 
+              className="text-solidus-platinum border-solidus-platinum hover:bg-solidus-platinum hover:text-solidus-dark-slate transition-all"
               onClick={() => setIsSearchDialogOpen(true)}
             >
-              <Search className="h-5 w-5" />
-              <span className="sr-only">Поиск</span>
+              <Search className="h-5 w-5 mr-2" />
+              Поиск
             </Button>
 
             {isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="text-solidus-platinum">
+                  <Button variant="outline" className="text-solidus-platinum border-solidus-platinum hover:bg-solidus-platinum hover:text-solidus-dark-slate transition-all">
                     <User className="h-5 w-5 mr-2" />
                     {user?.name}
                   </Button>
@@ -129,9 +128,9 @@ export const Header = () => {
               </DropdownMenu>
             ) : (
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => setIsLoginDialogOpen(true)}
-                className="text-solidus-platinum"
+                className="text-solidus-platinum border-solidus-platinum hover:bg-solidus-platinum hover:text-solidus-dark-slate transition-all"
               >
                 <User className="h-5 w-5 mr-2" />
                 Войти
@@ -202,3 +201,4 @@ export const Header = () => {
     </header>
   );
 };
+
