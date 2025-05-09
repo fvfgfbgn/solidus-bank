@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 // Mock data
 const ADMIN_USER: User = {
   id: "admin-1",
-  username: "0000",
+  username: "admin",
   role: "admin",
   name: "Администратор",
   canAccessSecretData: true,
@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (username: string, password: string): Promise<boolean> => {
     // Admin login
-    if (username === "0000" && password === "admin") {
+    if (username === "admin" && password === "0000") {
       setUser(ADMIN_USER);
       localStorage.setItem("solidusUser", JSON.stringify(ADMIN_USER));
       toast({

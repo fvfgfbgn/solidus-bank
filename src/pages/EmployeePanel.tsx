@@ -11,6 +11,7 @@ import { SecretData } from "@/components/admin/SecretData";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { InternalCommunications } from "@/components/admin/InternalCommunications";
 
 export default function EmployeePanel() {
   const { user, isAuthenticated } = useAuth();
@@ -53,7 +54,8 @@ export default function EmployeePanel() {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-8">
               <TabsTrigger value="clients">Клиенты</TabsTrigger>
-              <TabsTrigger value="communications">Коммуникации</TabsTrigger>
+              <TabsTrigger value="communications">Коммуникации с клиентами</TabsTrigger>
+              <TabsTrigger value="internal">Внутренние коммуникации</TabsTrigger>
               {user?.canAccessSecretData && (
                 <TabsTrigger value="secret">Секретные данные</TabsTrigger>
               )}
@@ -65,6 +67,10 @@ export default function EmployeePanel() {
             
             <TabsContent value="communications">
               <Communications />
+            </TabsContent>
+            
+            <TabsContent value="internal">
+              <InternalCommunications />
             </TabsContent>
             
             {user?.canAccessSecretData && (

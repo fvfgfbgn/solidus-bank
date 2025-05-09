@@ -166,7 +166,7 @@ export const Header = () => {
                 placeholder="Введите пароль"
               />
               <div className="text-xs text-muted-foreground mt-1">
-                Для администратора: логин - 0000, пароль - admin
+                Для администратора: логин - admin, пароль - 0000
                 <br />
                 Для сотрудников: пароль - password
               </div>
@@ -201,4 +201,3 @@ export const Header = () => {
     </header>
   );
 };
-

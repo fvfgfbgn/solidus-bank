@@ -9,6 +9,8 @@ import { EmployeeManagement } from "@/components/admin/EmployeeManagement";
 import { ActivityMonitor } from "@/components/admin/ActivityMonitor";
 import { SecretData } from "@/components/admin/SecretData";
 import { MarketAnalytics } from "@/components/MarketAnalytics";
+import { BankStatistics } from "@/components/admin/BankStatistics";
+import { InternalCommunications } from "@/components/admin/InternalCommunications";
 
 export default function AdminPanel() {
   const { user, isAuthenticated } = useAuth();
@@ -31,6 +33,8 @@ export default function AdminPanel() {
             <TabsList className="mb-8">
               <TabsTrigger value="employees">Сотрудники</TabsTrigger>
               <TabsTrigger value="activity">Активность</TabsTrigger>
+              <TabsTrigger value="communications">Коммуникации</TabsTrigger>
+              <TabsTrigger value="statistics">Статистика</TabsTrigger>
               <TabsTrigger value="secret">Секретные данные</TabsTrigger>
               <TabsTrigger value="analytics">Аналитика</TabsTrigger>
             </TabsList>
@@ -41,6 +45,14 @@ export default function AdminPanel() {
             
             <TabsContent value="activity">
               <ActivityMonitor />
+            </TabsContent>
+            
+            <TabsContent value="communications">
+              <InternalCommunications />
+            </TabsContent>
+            
+            <TabsContent value="statistics">
+              <BankStatistics />
             </TabsContent>
             
             <TabsContent value="secret">
