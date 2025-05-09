@@ -45,6 +45,11 @@ interface PieChartProps extends BaseChartProps {
   outerRadius?: number;
 }
 
+// Define a custom tooltip component wrapper that satisfies Recharts types
+const CustomTooltip = (props: any) => {
+  return <ChartTooltipContent {...props} />;
+};
+
 export const AreaChart: React.FC<CartesianChartProps> = ({
   data,
   index,
@@ -83,7 +88,7 @@ export const AreaChart: React.FC<CartesianChartProps> = ({
               } : undefined} 
             />}
             {showYAxis && <YAxis width={yAxisWidth} domain={autoMinValue ? ['auto', 'auto'] : undefined} />}
-            {showTooltip && <Tooltip content={(props) => <ChartTooltipContent {...props} />} />}
+            {showTooltip && <Tooltip content={<CustomTooltip />} />}
             {showLegend && <Legend />}
             {categories.map((category, i) => (
               <Area
@@ -133,7 +138,7 @@ export const BarChart: React.FC<CartesianChartProps> = ({
             {showGridLines && <CartesianGrid strokeDasharray="3 3" />}
             {showXAxis && <XAxis dataKey={index} />}
             {showYAxis && <YAxis width={yAxisWidth} />}
-            {showTooltip && <Tooltip content={(props) => <ChartTooltipContent {...props} />} />}
+            {showTooltip && <Tooltip content={<CustomTooltip />} />}
             {showLegend && <Legend />}
             {categories.map((category, i) => (
               <Bar
@@ -172,12 +177,17 @@ export const PieChart: React.FC<PieChartProps> = ({
     return acc;
   }, {} as Record<string, { label: string; color: string }>);
 
+  // Create a formatter for the tooltip that uses the valueFormatter
+  const tooltipFormatter = (value: any) => {
+    return valueFormatter(Number(value));
+  };
+
   return (
     <div className={className} style={{ width: "100%", height }}>
       <ChartContainer config={chartConfig}>
         <ResponsiveContainer width="100%" height="100%">
           <RechartsPieChart>
-            {showTooltip && <Tooltip content={(props) => <ChartTooltipContent {...props} formatter={(value) => valueFormatter(Number(value))} />} />}
+            {showTooltip && <Tooltip content={<CustomTooltip formatter={tooltipFormatter} />} />}
             {showLegend && <Legend />}
             <Pie
               data={data}
