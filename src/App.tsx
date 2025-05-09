@@ -16,10 +16,18 @@ import InterbankMarket from "./pages/markets/InterbankMarket";
 import KeyRate from "./pages/monetary/KeyRate";
 import Inflation from "./pages/monetary/Inflation";
 import MonetaryPolicy from "./pages/monetary/Policy";
+import Forecasts from "./pages/monetary/Forecasts";
 
 // About bank routes
 import About from "./pages/about/About";
 import Management from "./pages/about/Management";
+import Structure from "./pages/about/Structure";
+import Reports from "./pages/about/Reports";
+
+// Statistics routes
+import MacroeconomicsStats from "./pages/statistics/MacroeconomicsStats";
+import BankingStats from "./pages/statistics/BankingStats";
+import FinancialStats from "./pages/statistics/FinancialStats";
 
 // Regulations route
 import Regulations from "./pages/Regulations";
@@ -47,10 +55,18 @@ const App = () => (
           <Route path="/key-rate" element={<KeyRate />} />
           <Route path="/inflation" element={<Inflation />} />
           <Route path="/monetary-policy" element={<MonetaryPolicy />} />
+          <Route path="/forecasts" element={<Forecasts />} />
 
           {/* About bank routes */}
           <Route path="/about" element={<About />} />
           <Route path="/management" element={<Management />} />
+          <Route path="/structure" element={<Structure />} />
+          <Route path="/reports" element={<Reports />} />
+
+          {/* Statistics routes */}
+          <Route path="/statistics/macroeconomics" element={<MacroeconomicsStats />} />
+          <Route path="/statistics/banking" element={<BankingStats />} />
+          <Route path="/statistics/financial" element={<FinancialStats />} />
 
           {/* Other routes */}
           <Route path="/regulations" element={<Regulations />} />
