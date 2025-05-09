@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, Search } from "lucide-react";
 import { BarChart } from "@/components/ui/charts";
+import { ChartContainer } from "@/components/ui/chart";
 
 const annualReports = [
   { year: 2023, link: "#", description: "Годовой отчет за 2023 год", type: "annual" },
@@ -28,6 +30,22 @@ const financialData = [
 ];
 
 const Reports = () => {
+  // Define chart config for the financial data chart
+  const chartConfig = {
+    assets: {
+      label: "Активы",
+      theme: { light: "#3b82f6", dark: "#3b82f6" },
+    },
+    liabilities: {
+      label: "Обязательства",
+      theme: { light: "#ef4444", dark: "#ef4444" },
+    },
+    equity: {
+      label: "Капитал",
+      theme: { light: "#10b981", dark: "#10b981" },
+    },
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -105,14 +123,18 @@ const Reports = () => {
                   <CardTitle className="text-sm font-medium">Основные финансовые показатели</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <BarChart 
-                    data={financialData}
-                    index="name"
-                    categories={["assets", "liabilities", "equity"]}
-                    colors={["#3b82f6", "#ef4444", "#10b981"]}
-                    showGridLines={false}
-                    height={300}
-                  />
+                  <div className="h-[300px]">
+                    <ChartContainer config={chartConfig}>
+                      <BarChart 
+                        data={financialData}
+                        index="name"
+                        categories={["assets", "liabilities", "equity"]}
+                        colors={["#3b82f6", "#ef4444", "#10b981"]}
+                        showGridLines={false}
+                        height={300}
+                      />
+                    </ChartContainer>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

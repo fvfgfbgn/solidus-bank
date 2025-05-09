@@ -15,7 +15,7 @@ import {
   Legend,
   Cell
 } from "recharts";
-import { ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 
 interface BaseChartProps {
   data: any[];
@@ -60,32 +60,43 @@ export const AreaChart: React.FC<CartesianChartProps> = ({
   height = "100%",
   className,
 }) => {
+  // Create chart config for the categories
+  const chartConfig = categories.reduce((acc, category, i) => {
+    acc[category] = {
+      label: category,
+      color: colors[i % colors.length],
+    };
+    return acc;
+  }, {} as Record<string, { label: string; color: string }>);
+
   return (
     <div className={className} style={{ width: "100%", height }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <RechartsAreaChart data={data}>
-          {showGridLines && <CartesianGrid strokeDasharray="3 3" />}
-          {showXAxis && <XAxis 
-            dataKey={index} 
-            tickFormatter={startEndOnly ? (value, index) => {
-              return index === 0 || index === data.length - 1 ? value : "";
-            } : undefined} 
-          />}
-          {showYAxis && <YAxis width={yAxisWidth} domain={autoMinValue ? ['auto', 'auto'] : undefined} />}
-          {showTooltip && <Tooltip content={<ChartTooltipContent />} />}
-          {showLegend && <Legend />}
-          {categories.map((category, i) => (
-            <Area
-              key={category}
-              type="monotone"
-              dataKey={category}
-              stroke={colors[i % colors.length]}
-              fill={colors[i % colors.length]}
-              fillOpacity={0.3}
-            />
-          ))}
-        </RechartsAreaChart>
-      </ResponsiveContainer>
+      <ChartContainer config={chartConfig}>
+        <ResponsiveContainer width="100%" height="100%">
+          <RechartsAreaChart data={data}>
+            {showGridLines && <CartesianGrid strokeDasharray="3 3" />}
+            {showXAxis && <XAxis 
+              dataKey={index} 
+              tickFormatter={startEndOnly ? (value, index) => {
+                return index === 0 || index === data.length - 1 ? value : "";
+              } : undefined} 
+            />}
+            {showYAxis && <YAxis width={yAxisWidth} domain={autoMinValue ? ['auto', 'auto'] : undefined} />}
+            {showTooltip && <Tooltip content={(props) => <ChartTooltipContent {...props} />} />}
+            {showLegend && <Legend />}
+            {categories.map((category, i) => (
+              <Area
+                key={category}
+                type="monotone"
+                dataKey={category}
+                stroke={colors[i % colors.length]}
+                fill={colors[i % colors.length]}
+                fillOpacity={0.3}
+              />
+            ))}
+          </RechartsAreaChart>
+        </ResponsiveContainer>
+      </ChartContainer>
     </div>
   );
 };
@@ -104,24 +115,35 @@ export const BarChart: React.FC<CartesianChartProps> = ({
   height = "100%",
   className,
 }) => {
+  // Create chart config for the categories
+  const chartConfig = categories.reduce((acc, category, i) => {
+    acc[category] = {
+      label: category,
+      color: colors[i % colors.length],
+    };
+    return acc;
+  }, {} as Record<string, { label: string; color: string }>);
+
   return (
     <div className={className} style={{ width: "100%", height }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <RechartsBarChart data={data}>
-          {showGridLines && <CartesianGrid strokeDasharray="3 3" />}
-          {showXAxis && <XAxis dataKey={index} />}
-          {showYAxis && <YAxis width={yAxisWidth} />}
-          {showTooltip && <Tooltip content={<ChartTooltipContent />} />}
-          {showLegend && <Legend />}
-          {categories.map((category, i) => (
-            <Bar
-              key={category}
-              dataKey={category}
-              fill={colors[i % colors.length]}
-            />
-          ))}
-        </RechartsBarChart>
-      </ResponsiveContainer>
+      <ChartContainer config={chartConfig}>
+        <ResponsiveContainer width="100%" height="100%">
+          <RechartsBarChart data={data}>
+            {showGridLines && <CartesianGrid strokeDasharray="3 3" />}
+            {showXAxis && <XAxis dataKey={index} />}
+            {showYAxis && <YAxis width={yAxisWidth} />}
+            {showTooltip && <Tooltip content={(props) => <ChartTooltipContent {...props} />} />}
+            {showLegend && <Legend />}
+            {categories.map((category, i) => (
+              <Bar
+                key={category}
+                dataKey={category}
+                fill={colors[i % colors.length]}
+              />
+            ))}
+          </RechartsBarChart>
+        </ResponsiveContainer>
+      </ChartContainer>
     </div>
   );
 };
@@ -139,28 +161,40 @@ export const PieChart: React.FC<PieChartProps> = ({
   height = "100%",
   className,
 }) => {
+  // Create chart config for the pie slices
+  const chartConfig = data.reduce((acc, item, i) => {
+    const key = item[index as keyof typeof item] as string;
+    acc[key] = {
+      label: key,
+      color: colors[i % colors.length],
+    };
+    return acc;
+  }, {} as Record<string, { label: string; color: string }>);
+
   return (
     <div className={className} style={{ width: "100%", height }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <RechartsPieChart>
-          {showTooltip && <Tooltip formatter={(value) => valueFormatter(Number(value))} />}
-          {showLegend && <Legend />}
-          <Pie
-            data={data}
-            dataKey={category}
-            nameKey={index}
-            cx="50%"
-            cy="50%"
-            innerRadius={innerRadius}
-            outerRadius={outerRadius}
-            label={showTooltip ? false : (entry) => entry[index]}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-            ))}
-          </Pie>
-        </RechartsPieChart>
-      </ResponsiveContainer>
+      <ChartContainer config={chartConfig}>
+        <ResponsiveContainer width="100%" height="100%">
+          <RechartsPieChart>
+            {showTooltip && <Tooltip content={(props) => <ChartTooltipContent {...props} formatter={(value) => valueFormatter(Number(value))} />} />}
+            {showLegend && <Legend />}
+            <Pie
+              data={data}
+              dataKey={category}
+              nameKey={index}
+              cx="50%"
+              cy="50%"
+              innerRadius={innerRadius}
+              outerRadius={outerRadius}
+              label={showTooltip ? false : (entry) => entry[index]}
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+              ))}
+            </Pie>
+          </RechartsPieChart>
+        </ResponsiveContainer>
+      </ChartContainer>
     </div>
   );
 };

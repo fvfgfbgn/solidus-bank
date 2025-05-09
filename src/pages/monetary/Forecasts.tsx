@@ -141,7 +141,7 @@ const Forecasts = () => {
             
             <TabsContent value="documents">
               <div className="flex items-center justify-between mb-4">
-                <Select onValueChange={setSelectedYear}>
+                <Select onValueChange={setSelectedYear} defaultValue={selectedYear}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Выберите год" />
                   </SelectTrigger>
@@ -152,7 +152,7 @@ const Forecasts = () => {
                   </SelectContent>
                 </Select>
                 
-                <Select onValueChange={setSelectedDocumentType}>
+                <Select onValueChange={setSelectedDocumentType} defaultValue={selectedDocumentType}>
                   <SelectTrigger className="w-[220px]">
                     <SelectValue placeholder="Тип документа" />
                   </SelectTrigger>
