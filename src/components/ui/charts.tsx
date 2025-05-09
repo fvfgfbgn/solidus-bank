@@ -13,7 +13,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  Cell
+  Cell,
+  TooltipProps
 } from "recharts";
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 
