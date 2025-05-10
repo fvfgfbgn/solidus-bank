@@ -1,5 +1,120 @@
-
 # Полное руководство по установке и запуску проекта Solidus Bank
+
+## Создание портативной версии для Windows (без установки Node.js)
+
+Чтобы создать полностью автономную версию приложения для запуска на Windows без необходимости устанавливать Node.js и npm, следуйте этим шагам:
+
+### Необходимые инструменты (только для создания портативной версии)
+
+- Node.js (версия 16.x или выше)
+- npm (обычно устанавливается вместе с Node.js)
+- pkg (инструмент для упаковки Node.js приложений в исполняемые файлы)
+
+### Шаги по созданию портативной версии
+
+1. **Установка pkg глобально**:
+```bash
+npm install -g pkg
+```
+
+2. **Сборка проекта**:
+```bash
+npm run build
+```
+
+3. **Создание server.js для обслуживания статических файлов**:
+```bash
+echo "const express = require('express');
+const path = require('path');
+const app = express();
+const port = process.env.PORT || 8080;
+
+// Обслуживание статических файлов из папки dist
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// Обработка всех маршрутов для SPA
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+// Запуск сервера
+const server = app.listen(port, () => {
+  console.log(`Приложение Solidus Bank запущено на порту ${port}`);
+  console.log(`Откройте браузер и перейдите по адресу: http://localhost:${port}`);
+  
+  // Автоматическое открытие браузера
+  const open = require('open');
+  open(`http://localhost:${port}`);
+});
+
+// Обработка сигналов завершения для корректного закрытия
+process.on('SIGINT', () => {
+  console.log('Завершение работы сервера...');
+  server.close(() => {
+    console.log('Сервер остановлен');
+    process.exit(0);
+  });
+});" > server.js
+```
+
+4. **Добавление зависимостей для сервера**:
+```bash
+npm install express open --save
+npm install --save-dev @types/express
+```
+
+5. **Создание конфигурации для pkg**:
+```bash
+echo '{
+  "bin": "server.js",
+  "pkg": {
+    "targets": ["node16-win-x64"],
+    "outputPath": "portable",
+    "assets": ["dist/**/*"]
+  }
+}' > pkg.json
+```
+
+6. **Упаковка приложения**:
+```bash
+pkg --config pkg.json .
+```
+
+7. **Подготовка директории для распространения**:
+```bash
+mkdir -p SolidusBank
+cp portable/server-win-x64.exe SolidusBank/SolidusBank.exe
+cp -r ИНСТРУКЦИЯ.md OFFLINE_GUIDE.md SETUP.md SolidusBank/
+```
+
+8. **Упаковка для распространения**:
+```bash
+# Для Windows (используя PowerShell)
+Compress-Archive -Path SolidusBank -DestinationPath SolidusBank-portable.zip
+
+# Для Linux/Mac
+zip -r SolidusBank-portable.zip SolidusBank
+```
+
+После выполнения этих шагов вы получите файл `SolidusBank-portable.zip`, который содержит портативную версию вашего приложения. Пользователь может распаковать этот архив и запустить приложение без установки Node.js или других зависимостей.
+
+## Подготовка флеш-накопителя
+
+1. **Форматирование флеш-накопителя**:
+   - Вставьте флеш-накопитель в USB-порт
+   - В Windows откройте Проводник, щелкните правой кнопкой мыши по флеш-накопителю и выберите "Форматировать"
+   - Выберите файловую систему NTFS или exFAT (для файлов больше 4 ГБ)
+   - Нажмите "Начать"
+
+2. **Копирование файлов**:
+   - Распакуйте архив `SolidusBank-portable.zip`
+   - Скопируйте всю папку `SolidusBank` на флеш-накопитель
+   - Убедитесь, что структура папок сохранена
+
+3. **Дополнительно (рекомендуется)**:
+   - Добавьте на флеш-накопитель установщики необходимых драйверов и компонентов:
+     - Microsoft Visual C++ Redistributable (последней версии)
+     - Современный браузер (портативная версия Chrome или Firefox)
 
 ## Системные требования
 
@@ -281,6 +396,13 @@ solidus-bank/
 - [React Router](https://reactrouter.com/docs/en/v6)
 - [Recharts](https://recharts.org/en-US/api)
 - [React Query](https://tanstack.com/query/latest/docs/react/overview)
+
+### Особенности портативной версии
+
+- Портативная версия работает только в операционной системе Windows
+- Необходимо скопировать все файлы и сохранить структуру папок
+- Все файлы данных хранятся в папке с приложением
+- Для работы может потребоваться Microsoft Visual C++ Redistributable
 
 ### Контакты для поддержки
 
