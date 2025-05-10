@@ -2,6 +2,8 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 
 type NewsItem = {
   id: string;
@@ -9,6 +11,7 @@ type NewsItem = {
   excerpt: string;
   date: string;
   category: string;
+  url: string;
 };
 
 const NEWS_ITEMS: NewsItem[] = [
@@ -18,6 +21,7 @@ const NEWS_ITEMS: NewsItem[] = [
     excerpt: "Банк объявил о снижении ставок по ипотечным кредитам на 0,5 процентных пунктов с 1 июня.",
     date: "08.05.2025",
     category: "Пресс-релиз",
+    url: "https://cbr.ru/press/"
   },
   {
     id: "news-2",
@@ -25,6 +29,7 @@ const NEWS_ITEMS: NewsItem[] = [
     excerpt: "Теперь все операции можно выполнять с помощью удобного мобильного приложения, доступного на iOS и Android.",
     date: "06.05.2025",
     category: "Технологии",
+    url: "https://cbr.ru/press/"
   },
   {
     id: "news-3",
@@ -32,6 +37,7 @@ const NEWS_ITEMS: NewsItem[] = [
     excerpt: "С 15 мая вступают в силу новые тарифы на расчетно-кассовое обслуживание для юридических лиц.",
     date: "04.05.2025",
     category: "Обновления",
+    url: "https://cbr.ru/press/"
   },
   {
     id: "news-4",
@@ -39,6 +45,7 @@ const NEWS_ITEMS: NewsItem[] = [
     excerpt: "Банк принял участие в ежегодном экономическом форуме в качестве официального финансового партнера.",
     date: "02.05.2025",
     category: "События",
+    url: "https://cbr.ru/press/"
   },
 ];
 
@@ -58,9 +65,11 @@ export const NewsSection: React.FC = () => {
             <CardDescription className="text-base">{news.excerpt}</CardDescription>
           </CardContent>
           <CardFooter>
-            <button className="text-sm text-solidus-steel-blue font-medium hover:underline">
-              Читать полностью
-            </button>
+            <Button variant="link" className="p-0 flex items-center" asChild>
+              <a href={news.url} target="_blank" rel="noopener noreferrer">
+                Читать полностью <ExternalLink className="ml-1 h-3 w-3" />
+              </a>
+            </Button>
           </CardFooter>
         </Card>
       ))}

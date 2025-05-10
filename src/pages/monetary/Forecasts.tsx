@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { AreaChart } from "@/components/ui/charts";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 const forecastData = [
   { year: "2022", gdp: 150, inflation: 5.2 },
@@ -39,10 +40,10 @@ const keyRateData = [
 ];
 
 const forecastDocuments = [
-  { id: 1, title: "Обзор денежно-кредитной политики", year: "2024", type: "policy" },
-  { id: 2, title: "Прогноз инфляции на 2025 год", year: "2025", type: "inflation" },
-  { id: 3, title: "Анализ финансовых рынков", year: "2024", type: "market" },
-  { id: 4, title: "Основные направления денежно-кредитной политики", year: "2025", type: "policy" },
+  { id: 1, title: "Обзор денежно-кредитной политики", year: "2024", type: "policy", fileType: "pdf" },
+  { id: 2, title: "Прогноз инфляции на 2025 год", year: "2025", type: "inflation", fileType: "pdf" },
+  { id: 3, title: "Анализ финансовых рынков", year: "2024", type: "market", fileType: "docx" },
+  { id: 4, title: "Основные направления денежно-кредитной политики", year: "2025", type: "policy", fileType: "pdf" },
 ];
 
 const Forecasts = () => {
@@ -52,6 +53,21 @@ const Forecasts = () => {
   const filteredDocuments = selectedDocumentType === "all"
     ? forecastDocuments
     : forecastDocuments.filter(doc => doc.type === selectedDocumentType);
+  
+  const handleDownload = (documentId: number, documentTitle: string, fileType: string) => {
+    // В реальном приложении здесь был бы запрос к API для скачивания файла
+    toast({
+      title: "Загрузка файла",
+      description: `Скачивание файла "${documentTitle}.${fileType}" начато.`,
+    });
+  };
+
+  const handleReadDocument = (documentId: number, documentTitle: string) => {
+    toast({
+      title: "Просмотр документа",
+      description: `Открытие документа "${documentTitle}" для просмотра.`,
+    });
+  };
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -174,11 +190,16 @@ const Forecasts = () => {
                     <CardContent>
                       <div className="flex items-center justify-between">
                         <Badge variant="secondary">{doc.year}</Badge>
-                        <Button size="sm">
-                          <FileText className="mr-2 h-4 w-4" />
-                          Читать
-                          <Download className="ml-2 h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => handleReadDocument(doc.id, doc.title)}>
+                            <FileText className="mr-2 h-4 w-4" />
+                            Читать
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => handleDownload(doc.id, doc.title, doc.fileType)}>
+                            <Download className="h-4 w-4" />
+                            {doc.fileType.toUpperCase()}
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

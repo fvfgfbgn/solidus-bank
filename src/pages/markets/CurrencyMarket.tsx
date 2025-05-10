@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/components/ui/use-toast";
 
 // Sample historical data for USD rate
 const USD_HISTORY = [
@@ -88,7 +90,74 @@ const EUR_HISTORY = [
 
 export default function CurrencyMarket() {
   const [activeTab, setActiveTab] = useState("current");
-  const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const [selectedCurrency, setSelectedCurrency] = useState<string>("USD");
+  const [fromCurrency, setFromCurrency] = useState<string>("RUB");
+  const [toCurrency, setToCurrency] = useState<string>("USD");
+  const [fromAmount, setFromAmount] = useState<number>(100);
+  const [toAmount, setToAmount] = useState<number>(1.11);
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [archiveCurrency, setArchiveCurrency] = useState<string>("USD");
+  const [comparisonData, setComparisonData] = useState<{ old: number | null, current: number | null }>({ old: null, current: null });
+  
+  // Exchange rates for calculator (would come from API in real app)
+  const currencyRates = {
+    "USD": 89.74,
+    "EUR": 97.63,
+    "GBP": 114.15,
+    "JPY": 0.59,
+    "CNY": 12.37,
+    "CHF": 98.45,
+    "RUB": 1
+  };
+  
+  const handleCalculate = () => {
+    if (!fromCurrency || !toCurrency || !fromAmount || fromAmount <= 0) {
+      toast({
+        title: "Ошибка расчета",
+        description: "Пожалуйста, проверьте корректность введенных данных",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Convert to RUB first (if not already RUB), then to target currency
+    const amountInRub = fromCurrency === "RUB" ? fromAmount : fromAmount * currencyRates[fromCurrency];
+    const result = toCurrency === "RUB" ? amountInRub : amountInRub / currencyRates[toCurrency];
+    
+    setToAmount(parseFloat(result.toFixed(2)));
+    
+    toast({
+      title: "Расчет выполнен",
+      description: `${fromAmount} ${fromCurrency} = ${result.toFixed(2)} ${toCurrency}`,
+    });
+  };
+
+  const handleArchiveSearch = () => {
+    if (!startDate || !endDate) {
+      toast({
+        title: "Укажите даты",
+        description: "Для поиска необходимо указать начальную и конечную даты",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // В реальном приложении здесь был бы запрос к API для получения исторических данных
+    // Симулируем получение данных
+    const oldRate = 85.32; // Пример значения исторического курса
+    const currentRate = currencyRates[archiveCurrency]; 
+    
+    setComparisonData({
+      old: oldRate,
+      current: currentRate
+    });
+    
+    toast({
+      title: "Данные получены",
+      description: `Показаны исторические данные по курсу ${archiveCurrency} за выбранный период`,
+    });
+  };
   
   const chartConfig = {
     rate: {
@@ -202,7 +271,11 @@ export default function CurrencyMarket() {
                     <div>
                       <label className="block text-sm font-medium mb-2">Из валюты:</label>
                       <div className="grid grid-cols-2 gap-4 mb-4">
-                        <select className="p-2 border rounded-md">
+                        <select 
+                          className="p-2 border rounded-md"
+                          value={fromCurrency}
+                          onChange={(e) => setFromCurrency(e.target.value)}
+                        >
                           <option value="RUB">RUB - Российский рубль</option>
                           <option value="USD">USD - Доллар США</option>
                           <option value="EUR">EUR - Евро</option>
@@ -215,13 +288,19 @@ export default function CurrencyMarket() {
                           type="number" 
                           className="p-2 border rounded-md"
                           placeholder="Сумма"
-                          defaultValue={100}
+                          value={fromAmount}
+                          onChange={(e) => setFromAmount(parseFloat(e.target.value))}
+                          min="0"
                         />
                       </div>
                       
                       <label className="block text-sm font-medium mb-2">В валюту:</label>
                       <div className="grid grid-cols-2 gap-4">
-                        <select className="p-2 border rounded-md" defaultValue="USD">
+                        <select 
+                          className="p-2 border rounded-md" 
+                          value={toCurrency}
+                          onChange={(e) => setToCurrency(e.target.value)}
+                        >
                           <option value="RUB">RUB - Российский рубль</option>
                           <option value="USD">USD - Доллар США</option>
                           <option value="EUR">EUR - Евро</option>
@@ -234,13 +313,16 @@ export default function CurrencyMarket() {
                           type="number" 
                           className="p-2 border rounded-md bg-muted/50"
                           readOnly
-                          value="1.11"
+                          value={toAmount}
                         />
                       </div>
                       
-                      <button className="mt-6 w-full bg-solidus-steel-blue text-white py-2 rounded-md hover:bg-opacity-90 transition-colors">
+                      <Button 
+                        className="mt-6 w-full" 
+                        onClick={handleCalculate}
+                      >
                         Рассчитать
-                      </button>
+                      </Button>
                     </div>
                     
                     <div className="border-l pl-8 hidden md:block">
@@ -278,7 +360,11 @@ export default function CurrencyMarket() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                     <div>
                       <label className="block text-sm font-medium mb-2">Валюта:</label>
-                      <select className="w-full p-2 border rounded-md">
+                      <select 
+                        className="w-full p-2 border rounded-md"
+                        value={archiveCurrency}
+                        onChange={(e) => setArchiveCurrency(e.target.value)}
+                      >
                         <option value="USD">USD - Доллар США</option>
                         <option value="EUR">EUR - Евро</option>
                         <option value="GBP">GBP - Фунт стерлингов</option>
@@ -290,17 +376,66 @@ export default function CurrencyMarket() {
                     <div>
                       <label className="block text-sm font-medium mb-2">Период:</label>
                       <div className="grid grid-cols-2 gap-4">
-                        <input type="date" className="p-2 border rounded-md" />
-                        <input type="date" className="p-2 border rounded-md" />
+                        <input 
+                          type="date" 
+                          className="p-2 border rounded-md"
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                        />
+                        <input 
+                          type="date" 
+                          className="p-2 border rounded-md"
+                          value={endDate}
+                          onChange={(e) => setEndDate(e.target.value)}
+                        />
                       </div>
                     </div>
                   </div>
-                  <button className="w-full bg-solidus-steel-blue text-white py-2 rounded-md hover:bg-opacity-90 transition-colors">
-                    Показать
-                  </button>
-                  <div className="mt-6 text-center text-sm text-muted-foreground">
-                    Выберите валюту и период для получения архивных данных
-                  </div>
+                  <Button className="w-full mb-6" onClick={handleArchiveSearch}>
+                    Показать данные
+                  </Button>
+                  
+                  {comparisonData.old !== null && (
+                    <Card className="mb-6 bg-muted/30">
+                      <CardHeader>
+                        <CardTitle className="text-lg">Сравнение курсов {archiveCurrency}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="border-r pr-4">
+                            <p className="text-sm font-medium mb-1">Исторический курс:</p>
+                            <p className="text-2xl font-bold">{comparisonData.old} ₽</p>
+                            <p className="text-xs text-muted-foreground">
+                              {startDate && new Date(startDate).toLocaleDateString('ru-RU')}
+                            </p>
+                          </div>
+                          <div className="pl-4">
+                            <p className="text-sm font-medium mb-1">Текущий курс:</p>
+                            <p className="text-2xl font-bold">{comparisonData.current} ₽</p>
+                            <p className="text-xs text-muted-foreground">05.05.2025</p>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4 pt-4 border-t">
+                          <div className="flex justify-between">
+                            <p className="font-medium">Изменение:</p>
+                            {comparisonData.old !== null && comparisonData.current !== null && (
+                              <p className={`font-bold ${comparisonData.current > comparisonData.old ? 'text-red-500' : 'text-green-500'}`}>
+                                {((comparisonData.current - comparisonData.old) / comparisonData.old * 100).toFixed(2)}%
+                                ({(comparisonData.current - comparisonData.old).toFixed(2)} ₽)
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                  
+                  {comparisonData.old === null && (
+                    <div className="mt-6 text-center text-sm text-muted-foreground">
+                      Выберите валюту и период для получения архивных данных
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
