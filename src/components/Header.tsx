@@ -50,7 +50,7 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-solidus-dark-slate text-white shadow-md">
+    <header className="bg-solidus-dark-slate text-black shadow-md">
       {/* Top header with logo and auth */}
       <div className="container mx-auto py-4">
         <div className="flex items-center justify-between">
