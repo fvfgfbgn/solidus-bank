@@ -56,7 +56,7 @@ export const Header = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-solidus-platinum text-solidus-dark-slate flex items-center justify-center font-bold text-lg">S</div>
+              <div className="h-8 w-8 rounded-full bg-solidus-platinum text-solidus-dark-slate flex items-center justify-center font-bold text-lg"></div>
               <div>
                 <div className="font-bold text-xl">Solidus Bank</div>
                 <div className="text-xs text-solidus-platinum opacity-80">
