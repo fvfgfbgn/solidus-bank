@@ -107,7 +107,7 @@ export const Header = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="text-black border-black hover:bg-black hover:text-white transition-all">
-                    <User  className="h-5 w-5 mr-2" />
+                    <User className="h-5 w-5 mr-2" />
                     {user?.name}
                   </Button>
                 </DropdownMenuTrigger>
@@ -116,7 +116,7 @@ export const Header = () => {
                     title: "Профиль пользователя",
                     description: "Функция в разработке"
                   })}>
-                    <User Cog className="h-4 w-4" />
+                    <UserCog className="h-4 w-4" />
                     <span>Профиль</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="flex items-center gap-2 text-red-500" onClick={logout}>
@@ -131,7 +131,7 @@ export const Header = () => {
                 onClick={() => setIsLoginDialogOpen(true)}
                 className="text-black border-black hover:bg-black hover:text-white transition-all"
               >
-                <User  className="h-5 w-5 mr-2" />
+                <User className="h-5 w-5 mr-2" />
                 Войти
               </Button>
             )}
@@ -170,7 +170,7 @@ export const Header = () => {
                 Для сотрудников: пароль - password
               </div>
             </div>
-            <Button onClick={handleLogin} disabled={isLoggingIn} className="text-black">
+            <Button onClick={handleLogin} disabled={isLoggingIn} className="text-black border-black hover:bg-black hover:text-white transition-all">
               {isLoggingIn ? "Вход..." : "Войти"}
             </Button>
           </div>
@@ -193,10 +193,11 @@ export const Header = () => {
                 placeholder="Введите поисковый запрос"
               />
             </div>
-            <Button type="submit" className="text-black">Найти</Button>
+            <Button type="submit" className="text-black border-black hover:bg-black hover:text-white transition-all">Найти</Button>
           </form>
         </DialogContent>
       </Dialog>
     </header>
   );
 };
+
