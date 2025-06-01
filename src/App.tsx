@@ -1,3 +1,4 @@
+
 import { Toaster } from "sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -6,6 +7,8 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AdminPanel from "./pages/AdminPanel";
 import EmployeePanel from "./pages/EmployeePanel";
+import Registration from "./pages/Registration";
+import ClientDashboard from "./pages/ClientDashboard";
 
 // Financial markets routes
 import CurrencyMarket from "./pages/markets/CurrencyMarket";
@@ -45,6 +48,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/clients" element={<EmployeePanel />} />
+          <Route path="/registration" element={<Registration />} />
+          <Route path="/client-dashboard" element={<ClientDashboard />} />
 
           {/* Financial markets routes */}
           <Route path="/markets/currency" element={<CurrencyMarket />} />
