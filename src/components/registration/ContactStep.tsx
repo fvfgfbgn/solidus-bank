@@ -41,14 +41,38 @@ export const ContactStep = ({ data, onUpdate, onNext }: ContactStepProps) => {
     if (data.contactType === "phone") {
       const formattedPhone = formatPhone(value);
       onUpdate({ contact: formattedPhone });
+      // Очищаем ошибки при изменении
+      if (errors.contact) {
+        setErrors(prev => ({ ...prev, contact: "" }));
+      }
     }
+  };
+
+  const handleEmailChange = (value: string) => {
+    if (data.contactType === "email") {
+      onUpdate({ contact: value });
+      // Очищаем ошибки при изменении
+      if (errors.contact) {
+        setErrors(prev => ({ ...prev, contact: "" }));
+      }
+    }
+  };
+
+  const handleContactTypeChange = (value: "phone" | "email") => {
+    // Очищаем ошибки при смене типа контакта
+    setErrors({});
+    onUpdate({ contactType: value, contact: "" });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
-    if (data.contactType === "phone" && !validatePhone(data.contact)) {
+    if (!data.contact.trim()) {
+      newErrors.contact = data.contactType === "phone" 
+        ? "Введите номер телефона" 
+        : "Введите email адрес";
+    } else if (data.contactType === "phone" && !validatePhone(data.contact)) {
       newErrors.contact = "Введите корректный номер телефона";
     } else if (data.contactType === "email" && !validateEmail(data.contact)) {
       newErrors.contact = "Введите корректный email адрес";
@@ -68,9 +92,7 @@ export const ContactStep = ({ data, onUpdate, onNext }: ContactStepProps) => {
           <Label>Выберите способ связи</Label>
           <RadioGroup
             value={data.contactType}
-            onValueChange={(value) => {
-              onUpdate({ contactType: value as "phone" | "email", contact: "" });
-            }}
+            onValueChange={handleContactTypeChange}
             className="mt-2"
           >
             <div className="flex items-center space-x-2">
@@ -102,7 +124,7 @@ export const ContactStep = ({ data, onUpdate, onNext }: ContactStepProps) => {
               if (data.contactType === "phone") {
                 handlePhoneChange(e.target.value);
               } else {
-                onUpdate({ contact: e.target.value });
+                handleEmailChange(e.target.value);
               }
             }}
             placeholder={
