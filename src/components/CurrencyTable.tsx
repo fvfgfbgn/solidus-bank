@@ -1,55 +1,43 @@
 
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowDown, ArrowUp } from "lucide-react";
-
-type Currency = {
-  code: string;
-  name: string;
-  rate: number;
-  change: number;
-  previous: number;
-};
-
-const INITIAL_CURRENCIES: Currency[] = [
-  { code: "USD", name: "Доллар США", rate: 89.74, change: -0.34, previous: 90.08 },
-  { code: "EUR", name: "Евро", rate: 97.63, change: -0.24, previous: 97.87 },
-  { code: "GBP", name: "Фунт стерлингов", rate: 114.15, change: 0.46, previous: 113.69 },
-  { code: "JPY", name: "Японская иена", rate: 0.58, change: -0.01, previous: 0.59 },
-  { code: "CNY", name: "Китайский юань", rate: 12.76, change: 0.05, previous: 12.71 },
-  { code: "CHF", name: "Швейцарский франк", rate: 102.36, change: -0.18, previous: 102.54 },
-];
-
-// Function to generate updated currency rates
-const generateUpdatedRates = (currencies: Currency[]): Currency[] => {
-  return currencies.map(currency => {
-    const changeAmount = (Math.random() * 0.4 - 0.2).toFixed(2);
-    const newChange = parseFloat(changeAmount);
-    const newRate = parseFloat((currency.rate + newChange).toFixed(2));
-    
-    return {
-      ...currency,
-      rate: newRate,
-      change: newChange,
-      previous: currency.rate
-    };
-  });
-};
+import { ArrowDown, ArrowUp, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CurrencyService, CurrencyRate } from "@/services/currencyService";
 
 export const CurrencyTable: React.FC = () => {
-  const [currencies, setCurrencies] = useState<Currency[]>(INITIAL_CURRENCIES);
+  const [currencies, setCurrencies] = useState<CurrencyRate[]>([]);
   const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRealData, setIsRealData] = useState(false);
+
+  const currencyService = CurrencyService.getInstance();
+
+  const loadCurrencies = async () => {
+    setIsLoading(true);
+    try {
+      const rates = await currencyService.getCurrentRates();
+      setCurrencies(rates);
+      setLastUpdateTime(new Date());
+      setIsRealData(true);
+    } catch (error) {
+      console.error('Ошибка загрузки курсов:', error);
+      setIsRealData(false);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const updateInterval = setInterval(() => {
-      setCurrencies(generateUpdatedRates);
-      setLastUpdateTime(new Date());
-    }, 30000);
+    // Загружаем данные при первом рендере
+    loadCurrencies();
+    
+    // Обновляем каждые 10 минут
+    const updateInterval = setInterval(loadCurrencies, 10 * 60 * 1000);
     
     return () => clearInterval(updateInterval);
   }, []);
 
-  // Format the last update time
   const formattedTime = lastUpdateTime.toLocaleTimeString("ru-RU", {
     hour: "2-digit",
     minute: "2-digit",
@@ -61,9 +49,21 @@ export const CurrencyTable: React.FC = () => {
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <span>Курсы валют</span>
-          <span className="text-sm font-normal text-muted-foreground">
-            Обновлено: {formattedTime}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-normal text-muted-foreground">
+              Обновлено: {formattedTime}
+              {isRealData && <span className="text-green-600 ml-1">(ЦБ РФ)</span>}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={loadCurrencies}
+              disabled={isLoading}
+              className="h-8 w-8 p-0"
+            >
+              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -99,6 +99,11 @@ export const CurrencyTable: React.FC = () => {
             </tbody>
           </table>
         </div>
+        {!isRealData && (
+          <div className="mt-4 text-xs text-orange-600 text-center">
+            Данные могут быть неактуальными. Проверьте подключение к интернету.
+          </div>
+        )}
       </CardContent>
     </Card>
   );

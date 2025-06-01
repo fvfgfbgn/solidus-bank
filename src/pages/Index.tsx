@@ -32,12 +32,14 @@ export default function Index() {
                 Основа вашего будущего. Надежность, проверенная временем.
               </p>
               {!isAuthenticated && (
-                <Button
-                  className="bg-white text-solidus-dark-slate hover:bg-solidus-platinum px-6"
-                  size="lg"
-                >
-                  Стать клиентом
-                </Button>
+                <Link to="/registration">
+                  <Button
+                    className="bg-white text-solidus-dark-slate hover:bg-solidus-platinum px-6"
+                    size="lg"
+                  >
+                    Стать клиентом
+                  </Button>
+                </Link>
               )}
             </div>
           </div>
@@ -417,4 +419,3 @@ export default function Index() {
     </div>
   );
 }
-

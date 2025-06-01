@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, Menu, Search, UserCog } from "lucide-react";
+import { User, LogOut, Menu, Search, UserCog, UserPlus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -126,14 +127,25 @@ export const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button
-                variant="outline"
-                onClick={() => setIsLoginDialogOpen(true)}
-                className="text-black border-black hover:bg-black hover:text-white transition-all"
-              >
-                <User className="h-5 w-5 mr-2" />
-                Войти
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsLoginDialogOpen(true)}
+                  className="text-black border-black hover:bg-black hover:text-white transition-all"
+                >
+                  <User className="h-5 w-5 mr-2" />
+                  Войти
+                </Button>
+                <Link to="/registration">
+                  <Button
+                    variant="default"
+                    className="bg-black text-white hover:bg-gray-800 transition-all"
+                  >
+                    <UserPlus className="h-5 w-5 mr-2" />
+                    Регистрация
+                  </Button>
+                </Link>
+              </div>
             )}
           </div>
         </div>
@@ -177,7 +189,6 @@ export const Header = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Search Dialog */}
       <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
