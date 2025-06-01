@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, ArrowRight } from "lucide-react";
 import { RegistrationData } from "@/pages/Registration";
 import { Link } from "react-router-dom";
 
@@ -15,34 +15,50 @@ export const SuccessStep = ({ data }: SuccessStepProps) => {
       <div className="flex justify-center">
         <CheckCircle className="h-16 w-16 text-green-500" />
       </div>
-      
+
       <div className="space-y-2">
-        <h3 className="text-xl font-semibold text-green-700">
-          Регистрация успешно завершена!
-        </h3>
+        <h2 className="text-2xl font-bold text-green-600">
+          Регистрация завершена!
+        </h2>
         <p className="text-gray-600">
-          Добро пожаловать в Банк Solidus, {data.firstName}!
+          Добро пожаловать в Solidus Bank, {data.firstName}!
         </p>
       </div>
 
-      <div className="bg-green-50 p-4 rounded-lg">
-        <p className="text-sm text-green-700">
-          Ваша заявка на регистрацию принята. В ближайшее время с вами свяжется сотрудник банка для завершения оформления услуг.
+      <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+        <h3 className="font-semibold">Ваши данные для входа:</h3>
+        <p className="text-sm">
+          <span className="font-medium">Контакт:</span> {data.contact}
+        </p>
+        <p className="text-sm text-gray-500">
+          Пароль сохранен и зашифрован
         </p>
       </div>
 
       <div className="space-y-3">
-        <Button asChild className="w-full">
-          <Link to="/client-dashboard">
-            Перейти в личный кабинет
-          </Link>
-        </Button>
+        <p className="text-sm text-gray-600">
+          Вы можете войти в систему, используя указанные данные
+        </p>
         
-        <Button variant="outline" asChild className="w-full">
-          <Link to="/">
-            Вернуться на главную
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link to="/client-dashboard" className="flex-1">
+            <Button className="w-full">
+              <ArrowRight className="h-4 w-4 mr-2" />
+              Войти в личный кабинет
+            </Button>
           </Link>
-        </Button>
+          
+          <Link to="/" className="flex-1">
+            <Button variant="outline" className="w-full">
+              На главную
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      <div className="text-xs text-gray-500 space-y-1">
+        <p>На ваш контакт отправлено письмо с подтверждением регистрации</p>
+        <p>Если у вас возникнут вопросы, обратитесь в службу поддержки</p>
       </div>
     </div>
   );

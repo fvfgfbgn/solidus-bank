@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -9,19 +9,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
 import { MessageSquare, Send, Search, Bell, CheckCheck } from "lucide-react";
 import { toast } from "sonner";
-
-type InternalMessage = {
-  id: string;
-  sender: string;
-  senderId: string;
-  recipient: string | null;
-  recipientId: string | null;
-  title: string;
-  content: string;
-  timestamp: Date;
-  isRead: boolean;
-  type: "message" | "proposal" | "issue" | "announcement";
-};
+import { communicationStore } from "@/utils/communicationStore";
+import { InternalMessage } from "@/types/communications";
 
 export const InternalCommunications: React.FC = () => {
   const { user, employees } = useAuth();
@@ -31,58 +20,19 @@ export const InternalCommunications: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [recipient, setRecipient] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"message" | "proposal" | "issue" | "announcement">("message");
+  const [messages, setMessages] = useState<InternalMessage[]>([]);
 
-  // Имитируем хранилище сообщений
-  const [messages, setMessages] = useState<InternalMessage[]>([
-    {
-      id: "msg-1",
-      sender: "Иван Петров",
-      senderId: "emp-1",
-      recipient: "Администратор",
-      recipientId: "admin-1",
-      title: "Предложение по улучшению интерфейса",
-      content: "Добрый день! У меня есть предложение по улучшению интерфейса системы для работы с клиентами. Предлагаю добавить возможность быстрого доступа к часто используемым функциям.",
-      timestamp: new Date(Date.now() - 3600000),
-      isRead: true,
-      type: "proposal"
-    },
-    {
-      id: "msg-2",
-      sender: "Администратор",
-      senderId: "admin-1",
-      recipient: "Иван Петров",
-      recipientId: "emp-1",
-      title: "Ответ на предложение",
-      content: "Здравствуйте! Ваше предложение принято к рассмотрению. В ближайшее время мы его реализуем.",
-      timestamp: new Date(Date.now() - 2500000),
-      isRead: false,
-      type: "message"
-    },
-    {
-      id: "msg-3",
-      sender: "Анна Смирнова",
-      senderId: "emp-2",
-      recipient: "Администратор",
-      recipientId: "admin-1",
-      title: "Проблема с доступом к базе данных",
-      content: "Добрый день! Не могу получить доступ к базе данных клиентов. Система выдает ошибку авторизации. Прошу помочь решить проблему.",
-      timestamp: new Date(Date.now() - 1800000),
-      isRead: false,
-      type: "issue"
-    },
-    {
-      id: "msg-4",
-      sender: "Администратор",
-      senderId: "admin-1",
-      recipient: null,
-      recipientId: null,
-      title: "Обновление системы",
-      content: "Уважаемые коллеги! Сообщаем, что сегодня в 22:00 будет проводиться плановое обновление системы. Продолжительность работ составит примерно 2 часа.",
-      timestamp: new Date(Date.now() - 900000),
-      isRead: false,
-      type: "announcement"
-    }
-  ]);
+  // Подписка на изменения в хранилище сообщений
+  useEffect(() => {
+    const updateMessages = () => {
+      setMessages(communicationStore.getAllMessages());
+    };
+
+    updateMessages();
+    const unsubscribe = communicationStore.subscribe(updateMessages);
+
+    return unsubscribe;
+  }, []);
 
   const handleSendMessage = () => {
     if (!title.trim() || !message.trim()) return;
@@ -100,7 +50,7 @@ export const InternalCommunications: React.FC = () => {
       type: messageType
     };
     
-    setMessages(prev => [...prev, newMessage]);
+    communicationStore.addMessage(newMessage);
     setMessage("");
     setTitle("");
     setRecipient(null);
@@ -112,13 +62,7 @@ export const InternalCommunications: React.FC = () => {
   };
   
   const markAsRead = (messageId: string) => {
-    setMessages(prev => 
-      prev.map(msg => 
-        msg.id === messageId 
-          ? { ...msg, isRead: true }
-          : msg
-      )
-    );
+    communicationStore.markAsRead(messageId);
   };
   
   const getTypeIcon = (type: InternalMessage["type"]) => {
@@ -134,19 +78,18 @@ export const InternalCommunications: React.FC = () => {
     }
   };
   
-  // Фильтр входящих сообщений
-  const incomingMessages = messages.filter(msg => 
-    msg.recipientId === user?.id || (msg.recipientId === null && msg.senderId !== user?.id)
-  ).filter(msg =>
+  // Получаем сообщения для текущего пользователя
+  const userMessages = communicationStore.getMessagesForUser(user?.id || "");
+  
+  // Фильтрация входящих сообщений
+  const incomingMessages = userMessages.incoming.filter(msg =>
     msg.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     msg.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
     msg.content.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
-  // Фильтр исходящих сообщений
-  const outgoingMessages = messages.filter(msg => 
-    msg.senderId === user?.id
-  ).filter(msg =>
+  // Фильтрация исходящих сообщений
+  const outgoingMessages = userMessages.outgoing.filter(msg =>
     msg.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     msg.recipient?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     msg.content.toLowerCase().includes(searchQuery.toLowerCase())
