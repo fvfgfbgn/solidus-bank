@@ -3,22 +3,17 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowUpRight, ArrowDownLeft, Filter } from "lucide-react";
+import { useClient } from "@/contexts/ClientContext";
 
 export const TransactionHistory = () => {
-  const transactions = [
-    { id: 1, type: "income", amount: "5000.00", description: "Зарплата", date: "2024-01-15", time: "14:30" },
-    { id: 2, type: "expense", amount: "1250.00", description: "Продуктовый магазин", date: "2024-01-14", time: "18:45" },
-    { id: 3, type: "expense", amount: "850.00", description: "Коммунальные услуги", date: "2024-01-13", time: "09:15" },
-    { id: 4, type: "income", amount: "2000.00", description: "Перевод от друга", date: "2024-01-12", time: "16:20" },
-    { id: 5, type: "expense", amount: "3200.00", description: "Онлайн покупка", date: "2024-01-11", time: "12:10" },
-  ];
+  const { clientData } = useClient();
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>История операций</CardTitle>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="border-blue-200 text-blue-700">
             <Filter className="h-4 w-4 mr-2" />
             Фильтры
           </Button>
@@ -26,7 +21,7 @@ export const TransactionHistory = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {transactions.map((transaction) => (
+          {clientData.transactions.map((transaction) => (
             <div key={transaction.id} className="flex items-center justify-between py-3 border-b last:border-b-0">
               <div className="flex items-center gap-3">
                 {transaction.type === "income" ? (
@@ -44,14 +39,23 @@ export const TransactionHistory = () => {
               <div className={`font-semibold ${
                 transaction.type === "income" ? "text-green-600" : "text-red-600"
               }`}>
-                {transaction.type === "income" ? "+" : "-"}{transaction.amount} ₽
+                {transaction.type === "income" ? "+" : "-"}{transaction.amount.toLocaleString('ru-RU')} ₽
               </div>
             </div>
           ))}
         </div>
-        <div className="mt-4 text-center">
-          <Button variant="outline">Показать еще</Button>
-        </div>
+        {clientData.transactions.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            Операций пока нет
+          </div>
+        )}
+        {clientData.transactions.length > 0 && (
+          <div className="mt-4 text-center">
+            <Button variant="outline" className="border-blue-200 text-blue-700">
+              Показать еще
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

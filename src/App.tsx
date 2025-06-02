@@ -1,88 +1,76 @@
 
-import { Toaster } from "sonner";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ClientProvider } from "@/contexts/ClientContext";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
+import Registration from "./pages/Registration";
 import AdminPanel from "./pages/AdminPanel";
 import EmployeePanel from "./pages/EmployeePanel";
-import Registration from "./pages/Registration";
 import ClientDashboard from "./pages/ClientDashboard";
-
-// Financial markets routes
-import CurrencyMarket from "./pages/markets/CurrencyMarket";
-import SecuritiesMarket from "./pages/markets/SecuritiesMarket";
-import InterbankMarket from "./pages/markets/InterbankMarket";
-
-// Monetary policy routes
-import KeyRate from "./pages/monetary/KeyRate";
-import Inflation from "./pages/monetary/Inflation";
-import MonetaryPolicy from "./pages/monetary/Policy";
-import Forecasts from "./pages/monetary/Forecasts";
-
-// About bank routes
+import NotFound from "./pages/NotFound";
 import About from "./pages/about/About";
 import Management from "./pages/about/Management";
 import Structure from "./pages/about/Structure";
 import Reports from "./pages/about/Reports";
-
-// Statistics routes
-import MacroeconomicsStats from "./pages/statistics/MacroeconomicsStats";
+import Policy from "./pages/monetary/Policy";
+import KeyRate from "./pages/monetary/KeyRate";
+import Inflation from "./pages/monetary/Inflation";
+import Forecasts from "./pages/monetary/Forecasts";
+import InterbankMarket from "./pages/markets/InterbankMarket";
+import CurrencyMarket from "./pages/markets/CurrencyMarket";
+import SecuritiesMarket from "./pages/markets/SecuritiesMarket";
 import BankingStats from "./pages/statistics/BankingStats";
 import FinancialStats from "./pages/statistics/FinancialStats";
-
-// Regulations route
+import MacroeconomicsStats from "./pages/statistics/MacroeconomicsStats";
 import Regulations from "./pages/Regulations";
 import PressCenter from "./pages/PressCenter";
+import "./App.css";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <Toaster position="top-right" />
-      <BrowserRouter>
-        <Routes>
-          {/* Main routes */}
-          <Route path="/" element={<Index />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/clients" element={<EmployeePanel />} />
-          <Route path="/registration" element={<Registration />} />
-          <Route path="/client-dashboard" element={<ClientDashboard />} />
-
-          {/* Financial markets routes */}
-          <Route path="/markets/currency" element={<CurrencyMarket />} />
-          <Route path="/markets/securities" element={<SecuritiesMarket />} />
-          <Route path="/markets/interbank" element={<InterbankMarket />} />
-
-          {/* Monetary policy routes */}
-          <Route path="/key-rate" element={<KeyRate />} />
-          <Route path="/inflation" element={<Inflation />} />
-          <Route path="/monetary-policy" element={<MonetaryPolicy />} />
-          <Route path="/forecasts" element={<Forecasts />} />
-
-          {/* About bank routes */}
-          <Route path="/about" element={<About />} />
-          <Route path="/management" element={<Management />} />
-          <Route path="/structure" element={<Structure />} />
-          <Route path="/reports" element={<Reports />} />
-
-          {/* Statistics routes */}
-          <Route path="/statistics/macroeconomics" element={<MacroeconomicsStats />} />
-          <Route path="/statistics/banking" element={<BankingStats />} />
-          <Route path="/statistics/financial" element={<FinancialStats />} />
-
-          {/* Other routes */}
-          <Route path="/regulations" element={<Regulations />} />
-          <Route path="/press-center" element={<PressCenter />} />
-
-          {/* Catch all */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <ClientProvider>
+            <Router>
+              <div className="min-h-screen bg-background">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/registration" element={<Registration />} />
+                  <Route path="/admin" element={<AdminPanel />} />
+                  <Route path="/employee" element={<EmployeePanel />} />
+                  <Route path="/client" element={<ClientDashboard />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/about/management" element={<Management />} />
+                  <Route path="/about/structure" element={<Structure />} />
+                  <Route path="/about/reports" element={<Reports />} />
+                  <Route path="/monetary-policy" element={<Policy />} />
+                  <Route path="/monetary-policy/key-rate" element={<KeyRate />} />
+                  <Route path="/monetary-policy/inflation" element={<Inflation />} />
+                  <Route path="/monetary-policy/forecasts" element={<Forecasts />} />
+                  <Route path="/markets/interbank" element={<InterbankMarket />} />
+                  <Route path="/markets/currency" element={<CurrencyMarket />} />
+                  <Route path="/markets/securities" element={<SecuritiesMarket />} />
+                  <Route path="/statistics/banking" element={<BankingStats />} />
+                  <Route path="/statistics/financial" element={<FinancialStats />} />
+                  <Route path="/statistics/macroeconomics" element={<MacroeconomicsStats />} />
+                  <Route path="/regulations" element={<Regulations />} />
+                  <Route path="/press-center" element={<PressCenter />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                <Toaster />
+              </div>
+            </Router>
+          </ClientProvider>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;

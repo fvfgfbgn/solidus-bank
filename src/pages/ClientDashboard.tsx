@@ -15,9 +15,7 @@ import {
   Download,
   Settings,
   Shield,
-  HelpCircle,
-  MapPin,
-  Phone
+  HelpCircle
 } from "lucide-react";
 import { AccountsCards } from "@/components/client/AccountsCards";
 import { TransactionHistory } from "@/components/client/TransactionHistory";
@@ -25,19 +23,26 @@ import { TransferMoney } from "@/components/client/TransferMoney";
 import { Support } from "@/components/client/Support";
 import { ProfileSettings } from "@/components/client/ProfileSettings";
 import { SecuritySettings } from "@/components/client/SecuritySettings";
+import { useClient } from "@/contexts/ClientContext";
 
 const ClientDashboard = () => {
-  // Mock data - в реальном приложении будет получаться из API
-  const userBalance = "156 750.00";
-  const recentTransactions = [
-    { id: 1, type: "income", amount: "5000.00", description: "Зарплата", date: "2024-01-15" },
-    { id: 2, type: "expense", amount: "1250.00", description: "Продуктовый магазин", date: "2024-01-14" },
-    { id: 3, type: "expense", amount: "850.00", description: "Коммунальные услуги", date: "2024-01-13" },
-  ];
+  const { clientData, addTransaction } = useClient();
+
+  const handleTopUp = () => {
+    const amount = prompt("Введите сумму пополнения:");
+    if (amount && !isNaN(Number(amount))) {
+      addTransaction({
+        type: 'income',
+        amount: Number(amount),
+        description: 'Пополнение счета',
+        category: 'Пополнение'
+      });
+    }
+  };
 
   const notifications = [
-    { id: 1, title: "Пополнение счета", message: "Ваш счет пополнен на 5000 ₽", time: "2 часа назад" },
-    { id: 2, title: "Заявка обработана", message: "Заявка на открытие карты одобрена", time: "1 день назад" },
+    { id: 1, title: "Добро пожаловать!", message: "Ваш счет успешно создан", time: "Сегодня" },
+    { id: 2, title: "Безопасность", message: "Рекомендуем настроить двухфакторную аутентификацию", time: "1 день назад" },
   ];
 
   return (
@@ -59,15 +64,18 @@ const ClientDashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-3xl font-bold text-green-600">
-                    {userBalance} ₽
+                  <div className="text-3xl font-bold text-blue-600">
+                    {clientData.balance.toLocaleString('ru-RU')} ₽
                   </div>
                 </CardContent>
               </Card>
 
               {/* Быстрые действия */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Button className="flex items-center gap-2 h-auto py-4">
+                <Button 
+                  onClick={handleTopUp}
+                  className="flex items-center gap-2 h-auto py-4 bg-blue-600 hover:bg-blue-700"
+                >
                   <Plus className="h-5 w-5" />
                   <div className="text-left">
                     <div className="font-semibold">Пополнить</div>
@@ -75,7 +83,7 @@ const ClientDashboard = () => {
                   </div>
                 </Button>
                 
-                <Button variant="outline" className="flex items-center gap-2 h-auto py-4">
+                <Button variant="outline" className="flex items-center gap-2 h-auto py-4 border-blue-200 text-blue-700">
                   <ArrowUpRight className="h-5 w-5" />
                   <div className="text-left">
                     <div className="font-semibold">Перевести</div>
@@ -83,11 +91,11 @@ const ClientDashboard = () => {
                   </div>
                 </Button>
                 
-                <Button variant="outline" className="flex items-center gap-2 h-auto py-4">
+                <Button variant="outline" className="flex items-center gap-2 h-auto py-4 border-blue-200 text-blue-700">
                   <CreditCard className="h-5 w-5" />
                   <div className="text-left">
                     <div className="font-semibold">Открыть</div>
-                    <div className="text-xs opacity-80">новый счёт</div>
+                    <div className="text-xs opacity-80">продукт</div>
                   </div>
                 </Button>
               </div>
@@ -122,7 +130,7 @@ const ClientDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {recentTransactions.map((transaction) => (
+                {clientData.transactions.slice(0, 3).map((transaction) => (
                   <div key={transaction.id} className="flex items-center justify-between py-2 border-b last:border-b-0">
                     <div className="flex items-center gap-3">
                       {transaction.type === "income" ? (
@@ -138,7 +146,7 @@ const ClientDashboard = () => {
                     <div className={`font-semibold ${
                       transaction.type === "income" ? "text-green-600" : "text-red-600"
                     }`}>
-                      {transaction.type === "income" ? "+" : "-"}{transaction.amount} ₽
+                      {transaction.type === "income" ? "+" : "-"}{transaction.amount.toLocaleString('ru-RU')} ₽
                     </div>
                   </div>
                 ))}
@@ -148,10 +156,10 @@ const ClientDashboard = () => {
 
           {/* Основные функции */}
           <Tabs defaultValue="accounts" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5">
               <TabsTrigger value="accounts" className="flex items-center gap-2">
                 <CreditCard className="h-4 w-4" />
-                Счета и карты
+                Продукты
               </TabsTrigger>
               <TabsTrigger value="transfers" className="flex items-center gap-2">
                 <ArrowUpRight className="h-4 w-4" />
@@ -168,10 +176,6 @@ const ClientDashboard = () => {
               <TabsTrigger value="security" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
                 Безопасность
-              </TabsTrigger>
-              <TabsTrigger value="info" className="flex items-center gap-2">
-                <HelpCircle className="h-4 w-4" />
-                Информация
               </TabsTrigger>
             </TabsList>
 
@@ -193,43 +197,6 @@ const ClientDashboard = () => {
 
             <TabsContent value="security">
               <SecuritySettings />
-            </TabsContent>
-
-            <TabsContent value="info">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Дополнительная информация</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Button variant="outline" className="flex items-center gap-2 h-auto py-4">
-                      <Download className="h-5 w-5" />
-                      <div className="text-left">
-                        <div className="font-semibold">Скачать выписки</div>
-                        <div className="text-xs opacity-70">PDF документы</div>
-                      </div>
-                    </Button>
-                    
-                    <Button variant="outline" className="flex items-center gap-2 h-auto py-4">
-                      <MapPin className="h-5 w-5" />
-                      <div className="text-left">
-                        <div className="font-semibold">Найти отделение</div>
-                        <div className="text-xs opacity-70">Карта и контакты</div>
-                      </div>
-                    </Button>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <h4 className="font-semibold">Тарифы и условия</h4>
-                    <p className="text-sm text-gray-600">
-                      Актуальная информация о тарифах на банковские услуги
-                    </p>
-                    <Button variant="link" className="p-0 h-auto">
-                      Подробнее
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
             </TabsContent>
           </Tabs>
         </div>
