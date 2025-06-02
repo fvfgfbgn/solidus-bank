@@ -45,6 +45,7 @@ function App() {
                   <Route path="/admin" element={<AdminPanel />} />
                   <Route path="/employee" element={<EmployeePanel />} />
                   <Route path="/client" element={<ClientDashboard />} />
+                  <Route path="/client-dashboard" element={<ClientDashboard />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/about/management" element={<Management />} />
                   <Route path="/about/structure" element={<Structure />} />
