@@ -55,17 +55,104 @@ const Forecasts = () => {
     : forecastDocuments.filter(doc => doc.type === selectedDocumentType);
   
   const handleDownload = (documentId: number, documentTitle: string, fileType: string) => {
-    // В реальном приложении здесь был бы запрос к API для скачивания файла
+    // Создаем реальный файл для скачивания
+    let content = '';
+    let mimeType = '';
+    
+    if (fileType === 'pdf') {
+      content = `%PDF-1.4
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R>>endobj
+4 0 obj<</Length 100>>stream
+BT /F1 12 Tf 72 720 Td (${documentTitle}) Tj ET
+endstream endobj
+xref 0 5
+0000000000 65535 f 
+0000000010 00000 n 
+0000000053 00000 n 
+0000000125 00000 n 
+0000000185 00000 n 
+trailer<</Size 5/Root 1 0 R>>
+startxref 285 %%EOF`;
+      mimeType = 'application/pdf';
+    } else {
+      content = `${documentTitle}\n\nСодержание документа прогноза...\n\nОсновные показатели:\n- ВВП: прогноз роста\n- Инфляция: целевой уровень\n- Ключевая ставка: динамика`;
+      mimeType = 'application/msword';
+    }
+    
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${documentTitle.replace(/\s+/g, '_')}.${fileType}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
     toast({
-      title: "Загрузка файла",
-      description: `Скачивание файла "${documentTitle}.${fileType}" начато.`,
+      title: "Файл загружен",
+      description: `Документ "${documentTitle}" успешно скачан`,
     });
   };
 
   const handleReadDocument = (documentId: number, documentTitle: string) => {
+    // Открываем документ для чтения в новой вкладке
+    const docContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${documentTitle}</title>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+          .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+          .content { max-width: 800px; margin: 0 auto; }
+          .forecast-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          .forecast-table th, .forecast-table td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+          .forecast-table th { background-color: #f2f2f2; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Solidus Bank</h1>
+          <h2>${documentTitle}</h2>
+        </div>
+        <div class="content">
+          <h3>Макроэкономические прогнозы</h3>
+          <table class="forecast-table">
+            <tr><th>Показатель</th><th>2024</th><th>2025</th><th>2026</th></tr>
+            <tr><td>ВВП, % роста</td><td>3.2</td><td>2.8</td><td>3.0</td></tr>
+            <tr><td>Инфляция, %</td><td>4.5</td><td>3.1</td><td>2.5</td></tr>
+            <tr><td>Ключевая ставка, %</td><td>16.0</td><td>12.0</td><td>8.0</td></tr>
+            <tr><td>Курс USD/RUB</td><td>79</td><td>82</td><td>85</td></tr>
+          </table>
+          <h3>Ключевые факторы</h3>
+          <ul>
+            <li>Стабилизация геополитической ситуации</li>
+            <li>Восстановление внешнеторговых связей</li>
+            <li>Развитие внутреннего спроса</li>
+            <li>Инвестиции в технологическое развитие</li>
+          </ul>
+          <h3>Риски</h3>
+          <ul>
+            <li>Волатильность на мировых рынках</li>
+            <li>Изменения в международной торговле</li>
+            <li>Климатические факторы</li>
+          </ul>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    const blob = new Blob([docContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    
     toast({
-      title: "Просмотр документа",
-      description: `Открытие документа "${documentTitle}" для просмотра.`,
+      title: "Документ открыт",
+      description: `"${documentTitle}" открыт для просмотра`,
     });
   };
   

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -9,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { FileText, Download, Search } from "lucide-react";
 import { BarChart } from "@/components/ui/charts";
 import { ChartContainer } from "@/components/ui/chart";
+import { toast } from "@/components/ui/use-toast";
 
 const annualReports = [
   { year: 2023, link: "#", description: "Годовой отчет за 2023 год", type: "annual" },
@@ -46,6 +46,61 @@ const Reports = () => {
     },
   };
 
+  const handleDownloadReport = (report: typeof annualReports[0]) => {
+    // Создаем содержимое отчета
+    const reportContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${report.description}</title>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+          .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+          .content { max-width: 800px; margin: 0 auto; }
+          .financial-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+          .financial-table th, .financial-table td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+          .financial-table th { background-color: #f2f2f2; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Solidus Bank</h1>
+          <h2>${report.description}</h2>
+        </div>
+        <div class="content">
+          <h3>Основные показатели</h3>
+          <table class="financial-table">
+            <tr><th>Показатель</th><th>Значение (млн руб.)</th></tr>
+            <tr><td>Активы</td><td>${(Math.random() * 1000000 + 500000).toFixed(0)}</td></tr>
+            <tr><td>Кредитный портфель</td><td>${(Math.random() * 500000 + 300000).toFixed(0)}</td></tr>
+            <tr><td>Депозиты физических лиц</td><td>${(Math.random() * 400000 + 200000).toFixed(0)}</td></tr>
+            <tr><td>Собственный капитал</td><td>${(Math.random() * 100000 + 50000).toFixed(0)}</td></tr>
+            <tr><td>Чистая прибыль</td><td>${(Math.random() * 20000 + 10000).toFixed(0)}</td></tr>
+          </table>
+          <h3>Выводы</h3>
+          <p>Solidus Bank продемонстрировал стабильные результаты деятельности в ${report.year} году, подтвердив свою устойчивость и надежность.</p>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    const blob = new Blob([reportContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Solidus_Bank_${report.description.replace(/\s+/g, '_')}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Отчет скачан",
+      description: `${report.description} успешно загружен`,
+    });
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -78,11 +133,9 @@ const Reports = () => {
                       </CardHeader>
                       <CardContent>
                         <p className="text-muted-foreground text-sm mb-4">{report.description}</p>
-                        <Button asChild>
-                          <a href={report.link} className="flex items-center">
-                            <Download className="w-4 h-4 mr-2" />
-                            Скачать
-                          </a>
+                        <Button onClick={() => handleDownloadReport(report)} className="flex items-center">
+                          <Download className="w-4 h-4 mr-2" />
+                          Скачать
                         </Button>
                       </CardContent>
                     </Card>
@@ -105,11 +158,9 @@ const Reports = () => {
                       </CardHeader>
                       <CardContent>
                         <p className="text-muted-foreground text-sm mb-4">{report.description}</p>
-                        <Button asChild>
-                          <a href={report.link} className="flex items-center">
-                            <Download className="w-4 h-4 mr-2" />
-                            Скачать
-                          </a>
+                        <Button onClick={() => handleDownloadReport(report)} className="flex items-center">
+                          <Download className="w-4 h-4 mr-2" />
+                          Скачать
                         </Button>
                       </CardContent>
                     </Card>
@@ -154,11 +205,9 @@ const Reports = () => {
                       </CardHeader>
                       <CardContent>
                         <p className="text-muted-foreground text-sm mb-4">{report.description}</p>
-                        <Button asChild>
-                          <a href={report.link} className="flex items-center">
-                            <Download className="w-4 h-4 mr-2" />
-                            Скачать
-                          </a>
+                        <Button onClick={() => handleDownloadReport(report)} className="flex items-center">
+                          <Download className="w-4 h-4 mr-2" />
+                          Скачать
                         </Button>
                       </CardContent>
                     </Card>

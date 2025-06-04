@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "@/components/ui/use-toast";
 
 type Document = {
   id: string;
@@ -81,6 +82,139 @@ const DOCUMENTS: Document[] = [
 export const RegulatoryDocuments: React.FC = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const handleViewDocument = (document: Document) => {
+    // Создаем имитацию просмотра документа в новой вкладке
+    const docContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${document.title}</title>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+          .header { border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+          .doc-number { color: #666; font-size: 14px; }
+          .content { max-width: 800px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="doc-number">${document.category} № ${document.number} от ${document.date}</div>
+          <h1>${document.title}</h1>
+        </div>
+        <div class="content">
+          <p>Настоящий документ содержит подробную информацию по теме "${document.title}".</p>
+          <p>Документ вступает в силу с момента опубликования и распространяется на все кредитные организации, осуществляющие деятельность на территории Российской Федерации.</p>
+          <h2>1. Общие положения</h2>
+          <p>1.1. Настоящий документ разработан в соответствии с действующим законодательством Российской Федерации.</p>
+          <p>1.2. Требования настоящего документа являются обязательными для исполнения.</p>
+          <h2>2. Основные требования</h2>
+          <p>2.1. Кредитные организации обязаны соблюдать установленные нормативы и требования.</p>
+          <p>2.2. Контроль за исполнением требований осуществляется Solidus Bank.</p>
+        </div>
+      </body>
+      </html>
+    `;
+    
+    const blob = new Blob([docContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+    
+    toast({
+      title: "Документ открыт",
+      description: `Просмотр документа "${document.title}" в новой вкладке`,
+    });
+  };
+  
+  const handleDownloadDocument = (document: Document) => {
+    // Создаем имитацию файла для скачивания
+    let content = '';
+    let mimeType = '';
+    let fileName = '';
+    
+    if (document.fileType === 'pdf') {
+      // Создаем простой PDF-подобный контент
+      content = `%PDF-1.4
+1 0 obj
+<<
+/Type /Catalog
+/Pages 2 0 R
+>>
+endobj
+
+2 0 obj
+<<
+/Type /Pages
+/Kids [3 0 R]
+/Count 1
+>>
+endobj
+
+3 0 obj
+<<
+/Type /Page
+/Parent 2 0 R
+/MediaBox [0 0 612 792]
+/Contents 4 0 R
+>>
+endobj
+
+4 0 obj
+<<
+/Length 100
+>>
+stream
+BT
+/F1 12 Tf
+72 720 Td
+(${document.title}) Tj
+ET
+endstream
+endobj
+
+xref
+0 5
+0000000000 65535 f 
+0000000010 00000 n 
+0000000053 00000 n 
+0000000125 00000 n 
+0000000185 00000 n 
+trailer
+<<
+/Size 5
+/Root 1 0 R
+>>
+startxref
+285
+%%EOF`;
+      mimeType = 'application/pdf';
+      fileName = `${document.number}_${document.date.replace(/\./g, '_')}.pdf`;
+    } else if (document.fileType === 'doc') {
+      content = `${document.title}\n\n${document.category} № ${document.number} от ${document.date}\n\nСодержание документа...`;
+      mimeType = 'application/msword';
+      fileName = `${document.number}_${document.date.replace(/\./g, '_')}.doc`;
+    } else {
+      content = `Название,Номер,Дата\n"${document.title}","${document.number}","${document.date}"`;
+      mimeType = 'application/vnd.ms-excel';
+      fileName = `${document.number}_${document.date.replace(/\./g, '_')}.xlsx`;
+    }
+    
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Файл скачан",
+      description: `Документ "${document.title}" успешно загружен`,
+    });
+  };
   
   return (
     <Card>
@@ -168,11 +302,21 @@ export const RegulatoryDocuments: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-4 mt-4">
-                      <Button variant="secondary" size="sm" className="flex items-center gap-2">
+                      <Button 
+                        variant="secondary" 
+                        size="sm" 
+                        className="flex items-center gap-2"
+                        onClick={() => handleViewDocument(document)}
+                      >
                         <FileText className="h-4 w-4" />
                         <span>Просмотр</span>
                       </Button>
-                      <Button variant="outline" size="sm" className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="flex items-center gap-2"
+                        onClick={() => handleDownloadDocument(document)}
+                      >
                         <Download className="h-4 w-4" />
                         <span>Скачать {document.fileType.toUpperCase()}</span>
                       </Button>
