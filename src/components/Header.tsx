@@ -1,213 +1,330 @@
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { User, LogOut, Menu, Search, UserCog, UserPlus } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/use-toast";
-import { MainNavigation } from "./MainNavigation";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { ChevronDown, Menu, X } from "lucide-react";
 
-export const Header = () => {
-  const { user, isAuthenticated, logout, login } = useAuth();
-  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
-  const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+export const Header: React.FC = () => {
+  const location = useLocation();
+  const { isAuthenticated, user, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const handleLogin = async () => {
-    setIsLoggingIn(true);
-    try {
-      const success = await login(username, password);
-      if (success) {
-        setIsLoginDialogOpen(false);
-        setUsername("");
-        setPassword("");
-      }
-    } finally {
-      setIsLoggingIn(false);
-    }
+  const handleLogout = () => {
+    logout();
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Поиск",
-      description: `Поиск по запросу: "${searchQuery}"`,
-    });
-    setIsSearchDialogOpen(false);
+  const toggleDropdown = (dropdown: string) => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  };
+
+  const closeDropdowns = () => {
+    setOpenDropdown(null);
   };
 
   return (
-    <header className="bg-solidus-dark-blue text-black shadow-md">
-      {/* Верхний заголовок с логотипом и авторизацией */}
-      <div className="container mx-auto py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-textsolidus-platinum items solidus-dark-slate flex items-center justify-center font-bold text-lg"></div>
-              <div>
-                <div className="font-bold text-xl">Банк Solidus</div>
-                <div className="text-xs text-solidus-platinum opacity-80">
-                  Основа вашего будущего
-                </div>
-              </div>
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/" className="text-xl font-bold text-solidus-steel-blue">
+            Solidus Bank
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link 
+              to="/" 
+              className={`text-sm font-medium transition-colors ${
+                location.pathname === "/" 
+                  ? "text-solidus-steel-blue" 
+                  : "text-gray-700 hover:text-solidus-steel-blue"
+              }`}
+            >
+              Главная
             </Link>
 
-            <Sheet>
-              <SheetTrigger className="md:hidden">
-                <Menu className="h-6 w-6" />
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-                <nav className="flex flex-col gap-4 mt-8">
-                  <Link to="/" className="px-4 py-2 hover:bg-accent rounded-md text-black">Главная</Link>
-                  <Link to="/about" className="px-4 py-2 hover:bg-accent rounded-md text-black">О банке</Link>
-                  <Link to="/monetary-policy" className="px-4 py-2 hover:bg-accent rounded-md text-black">Денежно-кредитная политика</Link>
-                  <Link to="/financial-markets" className="px-4 py-2 hover:bg-accent rounded-md text-black">Финансовые рынки</Link>
-                  <Link to="/statistics" className="px-4 py-2 hover:bg-accent rounded-md text-black">Статистика</Link>
-                  <Link to="/press-center" className="px-4 py-2 hover:bg-accent rounded-md text-black">Пресс-центр</Link>
-                  <Link to="/regulations" className="px-4 py-2 hover:bg-accent rounded-md text-black">Нормативные акты</Link>
-                  
-                  {isAuthenticated && user?.role === "admin" && (
-                    <Link to="/admin" className="px-4 py-2 hover:bg-accent rounded-md text-black">Панель администратора</Link>
-                  )}
-                  
-                  {isAuthenticated && user?.role === "employee" && (
-                    <Link to="/clients" className="px-4 py-2 hover:bg-accent rounded-md text-black">Клиенты</Link>
-                  )}
-                </nav>
-              </SheetContent>
-            </Sheet>
-            
-            {/* Desktop navigation */}
-            <MainNavigation />
-          </div>
+            {/* Курсы валют */}
+            <div className="relative">
+              <button
+                onClick={() => toggleDropdown('currency')}
+                className={`text-sm font-medium transition-colors flex items-center gap-1 ${
+                  location.pathname.includes('/currency') || location.pathname.includes('/markets')
+                    ? "text-solidus-steel-blue" 
+                    : "text-gray-700 hover:text-solidus-steel-blue"
+                }`}
+              >
+                Курсы валют
+                <ChevronDown className="h-4 w-4" />
+              </button>
+              {openDropdown === 'currency' && (
+                <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10">
+                  <div className="py-2">
+                    <Link
+                      to="/markets/currency"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Валютный рынок
+                    </Link>
+                    <Link
+                      to="/markets/securities"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Рынок ценных бумаг
+                    </Link>
+                    <Link
+                      to="/markets/interbank"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Межбанковский рынок
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
 
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              className="text-black border-black hover:bg-black hover:text-white transition-all"
-              onClick={() => setIsSearchDialogOpen(true)}
-            >
-              <Search className="h-5 w-5 mr-2" />
-              Поиск
-            </Button>
+            {/* Ставки */}
+            <div className="relative">
+              <button
+                onClick={() => toggleDropdown('rates')}
+                className={`text-sm font-medium transition-colors flex items-center gap-1 ${
+                  location.pathname.includes('/monetary')
+                    ? "text-solidus-steel-blue" 
+                    : "text-gray-700 hover:text-solidus-steel-blue"
+                }`}
+              >
+                Ставки
+                <ChevronDown className="h-4 w-4" />
+              </button>
+              {openDropdown === 'rates' && (
+                <div className="absolute top-full left-0 mt-1 w-56 bg-white border rounded-md shadow-lg z-10">
+                  <div className="py-2">
+                    <Link
+                      to="/monetary/key-rate"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Ключевая ставка
+                    </Link>
+                    <Link
+                      to="/monetary/policy"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Денежно-кредитная политика
+                    </Link>
+                    <Link
+                      to="/monetary/inflation"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Инфляция
+                    </Link>
+                    <Link
+                      to="/monetary/forecasts"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Прогнозы
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
 
+            {/* Аналитика */}
+            <div className="relative">
+              <button
+                onClick={() => toggleDropdown('analytics')}
+                className={`text-sm font-medium transition-colors flex items-center gap-1 ${
+                  location.pathname.includes('/statistics') || location.pathname.includes('/analytics')
+                    ? "text-solidus-steel-blue" 
+                    : "text-gray-700 hover:text-solidus-steel-blue"
+                }`}
+              >
+                Аналитика
+                <ChevronDown className="h-4 w-4" />
+              </button>
+              {openDropdown === 'analytics' && (
+                <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10">
+                  <div className="py-2">
+                    <Link
+                      to="/statistics/banking"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Банковская статистика
+                    </Link>
+                    <Link
+                      to="/statistics/macroeconomics"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Макроэкономическая статистика
+                    </Link>
+                    <Link
+                      to="/statistics/financial"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Финансовая статистика
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Другие разделы */}
+            <div className="relative">
+              <button
+                onClick={() => toggleDropdown('other')}
+                className="text-sm font-medium text-gray-700 hover:text-solidus-steel-blue transition-colors flex items-center gap-1"
+              >
+                Еще
+                <ChevronDown className="h-4 w-4" />
+              </button>
+              {openDropdown === 'other' && (
+                <div className="absolute top-full left-0 mt-1 w-56 bg-white border rounded-md shadow-lg z-10">
+                  <div className="py-2">
+                    <Link
+                      to="/about"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      О банке
+                    </Link>
+                    <Link
+                      to="/regulations"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Нормативные документы
+                    </Link>
+                    <Link
+                      to="/press"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={closeDropdowns}
+                    >
+                      Пресс-центр
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+          </nav>
+
+          {/* User Actions */}
+          <div className="flex items-center space-x-4">
             {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="text-black border-black hover:bg-black hover:text-white transition-all">
-                    <User className="h-5 w-5 mr-2" />
-                    {user?.name}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem className="flex items-center gap-2" onClick={() => toast({
-                    title: "Профиль пользователя",
-                    description: "Функция в разработке"
-                  })}>
-                    <UserCog className="h-4 w-4" />
-                    <span>Профиль</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="flex items-center gap-2 text-red-500" onClick={logout}>
-                    <LogOut className="h-4 w-4" />
-                    <span>Выйти</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsLoginDialogOpen(true)}
-                  className="text-black border-black hover:bg-black hover:text-white transition-all"
-                >
-                  <User className="h-5 w-5 mr-2" />
-                  Войти
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-gray-700">
+                  Добро пожаловать, {user?.firstName}
+                </span>
+                {user?.role === "admin" && (
+                  <Link to="/admin">
+                    <Button variant="outline" size="sm">
+                      Админ панель
+                    </Button>
+                  </Link>
+                )}
+                {user?.role === "employee" && (
+                  <Link to="/employee">
+                    <Button variant="outline" size="sm">
+                      Рабочая панель
+                    </Button>
+                  </Link>
+                )}
+                {user?.role === "client" && (
+                  <Link to="/client">
+                    <Button variant="outline" size="sm">
+                      Личный кабинет
+                    </Button>
+                  </Link>
+                )}
+                <Button onClick={handleLogout} variant="outline" size="sm">
+                  Выйти
                 </Button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
                 <Link to="/registration">
-                  <Button
-                    variant="default"
-                    className="bg-black text-white hover:bg-gray-800 transition-all"
-                  >
-                    <UserPlus className="h-5 w-5 mr-2" />
+                  <Button variant="outline" size="sm">
+                    Войти
+                  </Button>
+                </Link>
+                <Link to="/registration">
+                  <Button size="sm">
                     Регистрация
                   </Button>
                 </Link>
               </div>
             )}
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden"
+            >
+              {isMobileMenuOpen ? <X /> : <Menu />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden py-4 border-t">
+            <div className="space-y-2">
+              <Link
+                to="/"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Главная
+              </Link>
+              <Link
+                to="/markets/currency"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Курсы валют
+              </Link>
+              <Link
+                to="/monetary/key-rate"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Ставки
+              </Link>
+              <Link
+                to="/statistics/banking"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Аналитика
+              </Link>
+              <Link
+                to="/about"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                О банке
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Login Dialog */}
-      <Dialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Авторизация</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="username">Имя пользователя</Label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Введите имя пользователя"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="password">Пароль</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Введите пароль"
-              />
-              <div className="text-xs text-muted-foreground mt-1">
-                Для администратора: логин - admin, пароль - 0000
-                <br />
-                Для сотрудников: пароль - password
-              </div>
-            </div>
-            <Button onClick={handleLogin} disabled={isLoggingIn} className="text-black border-black hover:bg-black hover:text-white transition-all">
-              {isLoggingIn ? "Вход..." : "Войти"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isSearchDialogOpen} onOpenChange={setIsSearchDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Поиск по сайту</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSearch} className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="search">Поисковый запрос</Label>
-              <Input
-                id="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Введите поисковый запрос"
-              />
-            </div>
-            <Button type="submit" className="text-black border-black hover:bg-black hover:text-white transition-all">Найти</Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+      {/* Overlay for dropdowns */}
+      {openDropdown && (
+        <div
+          className="fixed inset-0 z-5"
+          onClick={closeDropdowns}
+        />
+      )}
     </header>
   );
 };
