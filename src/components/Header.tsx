@@ -222,7 +222,7 @@ export const Header: React.FC = () => {
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-700">
-                  Добро пожаловать, {user?.firstName}
+                  Добро пожаловать, {user?.name}
                 </span>
                 {user?.role === "admin" && (
                   <Link to="/admin">
