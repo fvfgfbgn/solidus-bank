@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
 
-type Document = {
+type RegulatoryDocument = {
   id: string;
   title: string;
   number: string;
@@ -22,7 +21,7 @@ type Document = {
   fileType: "pdf" | "doc" | "xlsx";
 };
 
-const DOCUMENTS: Document[] = [
+const DOCUMENTS: RegulatoryDocument[] = [
   {
     id: "doc-1",
     title: "О методике определения системно значимых кредитных организаций",
@@ -83,7 +82,7 @@ export const RegulatoryDocuments: React.FC = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
-  const handleViewDocument = (document: Document) => {
+  const handleViewDocument = (document: RegulatoryDocument) => {
     // Создаем имитацию просмотра документа в новой вкладке
     const docContent = `
       <!DOCTYPE html>
@@ -127,7 +126,7 @@ export const RegulatoryDocuments: React.FC = () => {
     });
   };
   
-  const handleDownloadDocument = (document: Document) => {
+  const handleDownloadDocument = (document: RegulatoryDocument) => {
     // Создаем имитацию файла для скачивания
     let content = '';
     let mimeType = '';
