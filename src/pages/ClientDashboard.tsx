@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -26,7 +25,7 @@ import { SecuritySettings } from "@/components/client/SecuritySettings";
 import { useClient } from "@/contexts/ClientContext";
 
 const ClientDashboard = () => {
-  const { clientData, addTransaction } = useClient();
+  const { clientData, addTransaction, addAccount, addCard } = useClient();
 
   const handleTopUp = () => {
     const amount = prompt("Введите сумму пополнения:");
@@ -37,6 +36,75 @@ const ClientDashboard = () => {
         description: 'Пополнение счета',
         category: 'Пополнение'
       });
+    }
+  };
+
+  const handleTransfer = () => {
+    // Переключаемся на вкладку переводов
+    const transferTab = document.querySelector('[value="transfers"]') as HTMLElement;
+    if (transferTab) {
+      transferTab.click();
+    }
+  };
+
+  const handleOpenProduct = () => {
+    const productTypes = [
+      '1. Сберегательный счет (0.5% годовых)',
+      '2. Депозитный счет (4.5% годовых)', 
+      '3. Валютный счет (USD)',
+      '4. Дебетовая карта',
+      '5. Кредитная карта (лимит 100,000 ₽)'
+    ];
+    
+    const choice = prompt(`Выберите продукт для открытия:\n${productTypes.join('\n')}\n\nВведите номер (1-5):`);
+    
+    if (choice && !isNaN(Number(choice)) && Number(choice) >= 1 && Number(choice) <= 5) {
+      const choiceNum = Number(choice);
+      
+      if (choiceNum <= 3) {
+        // Открываем счет
+        const accountTypes = ['Сберегательный счет', 'Депозитный счет', 'Валютный счет'];
+        const currencies = ['RUB', 'RUB', 'USD'];
+        
+        addAccount({
+          type: accountTypes[choiceNum - 1],
+          balance: 0,
+          currency: currencies[choiceNum - 1],
+          status: 'active'
+        });
+        
+        addTransaction({
+          type: 'income',
+          amount: 0,
+          description: `Открыт ${accountTypes[choiceNum - 1]}`,
+          category: 'Банковские операции'
+        });
+      } else {
+        // Заказываем карту
+        const cardTypes = ['Дебетовая карта', 'Кредитная карта'];
+        const cardType = cardTypes[choiceNum - 4];
+        
+        addCard({
+          type: cardType,
+          balance: cardType === 'Кредитная карта' ? 0 : clientData.balance,
+          expiryDate: new Date(Date.now() + 4 * 365 * 24 * 60 * 60 * 1000).toLocaleDateString('ru-RU').slice(3),
+          status: 'active',
+          ...(cardType === 'Кредитная карта' && { creditLimit: 100000 })
+        });
+        
+        addTransaction({
+          type: 'income',
+          amount: 0,
+          description: `Заказана ${cardType}`,
+          category: 'Банковские операции'
+        });
+      }
+      
+      // Переключаемся на вкладку продуктов
+      const accountsTab = document.querySelector('[value="accounts"]') as HTMLElement;
+      if (accountsTab) {
+        accountsTab.click();
+      }
     }
   };
 
@@ -83,7 +151,11 @@ const ClientDashboard = () => {
                   </div>
                 </Button>
                 
-                <Button variant="outline" className="flex items-center gap-2 h-auto py-4 border-blue-200 text-blue-700">
+                <Button 
+                  onClick={handleTransfer}
+                  variant="outline" 
+                  className="flex items-center gap-2 h-auto py-4 border-blue-200 text-blue-700 hover:bg-blue-50"
+                >
                   <ArrowUpRight className="h-5 w-5" />
                   <div className="text-left">
                     <div className="font-semibold">Перевести</div>
@@ -91,7 +163,11 @@ const ClientDashboard = () => {
                   </div>
                 </Button>
                 
-                <Button variant="outline" className="flex items-center gap-2 h-auto py-4 border-blue-200 text-blue-700">
+                <Button 
+                  onClick={handleOpenProduct}
+                  variant="outline" 
+                  className="flex items-center gap-2 h-auto py-4 border-blue-200 text-blue-700 hover:bg-blue-50"
+                >
                   <CreditCard className="h-5 w-5" />
                   <div className="text-left">
                     <div className="font-semibold">Открыть</div>
