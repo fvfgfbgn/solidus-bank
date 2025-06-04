@@ -82,13 +82,13 @@ export const RegulatoryDocuments: React.FC = () => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   
-  const handleViewDocument = (document: RegulatoryDocument) => {
+  const handleViewDocument = (doc: RegulatoryDocument) => {
     // Создаем имитацию просмотра документа в новой вкладке
     const docContent = `
       <!DOCTYPE html>
       <html>
       <head>
-        <title>${document.title}</title>
+        <title>${doc.title}</title>
         <meta charset="utf-8">
         <style>
           body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
@@ -99,11 +99,11 @@ export const RegulatoryDocuments: React.FC = () => {
       </head>
       <body>
         <div class="header">
-          <div class="doc-number">${document.category} № ${document.number} от ${document.date}</div>
-          <h1>${document.title}</h1>
+          <div class="doc-number">${doc.category} № ${doc.number} от ${doc.date}</div>
+          <h1>${doc.title}</h1>
         </div>
         <div class="content">
-          <p>Настоящий документ содержит подробную информацию по теме "${document.title}".</p>
+          <p>Настоящий документ содержит подробную информацию по теме "${doc.title}".</p>
           <p>Документ вступает в силу с момента опубликования и распространяется на все кредитные организации, осуществляющие деятельность на территории Российской Федерации.</p>
           <h2>1. Общие положения</h2>
           <p>1.1. Настоящий документ разработан в соответствии с действующим законодательством Российской Федерации.</p>
@@ -122,17 +122,17 @@ export const RegulatoryDocuments: React.FC = () => {
     
     toast({
       title: "Документ открыт",
-      description: `Просмотр документа "${document.title}" в новой вкладке`,
+      description: `Просмотр документа "${doc.title}" в новой вкладке`,
     });
   };
   
-  const handleDownloadDocument = (document: RegulatoryDocument) => {
+  const handleDownloadDocument = (doc: RegulatoryDocument) => {
     // Создаем имитацию файла для скачивания
     let content = '';
     let mimeType = '';
     let fileName = '';
     
-    if (document.fileType === 'pdf') {
+    if (doc.fileType === 'pdf') {
       // Создаем простой PDF-подобный контент
       content = `%PDF-1.4
 1 0 obj
@@ -167,7 +167,7 @@ stream
 BT
 /F1 12 Tf
 72 720 Td
-(${document.title}) Tj
+(${doc.title}) Tj
 ET
 endstream
 endobj
@@ -188,15 +188,15 @@ startxref
 285
 %%EOF`;
       mimeType = 'application/pdf';
-      fileName = `${document.number}_${document.date.replace(/\./g, '_')}.pdf`;
-    } else if (document.fileType === 'doc') {
-      content = `${document.title}\n\n${document.category} № ${document.number} от ${document.date}\n\nСодержание документа...`;
+      fileName = `${doc.number}_${doc.date.replace(/\./g, '_')}.pdf`;
+    } else if (doc.fileType === 'doc') {
+      content = `${doc.title}\n\n${doc.category} № ${doc.number} от ${doc.date}\n\nСодержание документа...`;
       mimeType = 'application/msword';
-      fileName = `${document.number}_${document.date.replace(/\./g, '_')}.doc`;
+      fileName = `${doc.number}_${doc.date.replace(/\./g, '_')}.doc`;
     } else {
-      content = `Название,Номер,Дата\n"${document.title}","${document.number}","${document.date}"`;
+      content = `Название,Номер,Дата\n"${doc.title}","${doc.number}","${doc.date}"`;
       mimeType = 'application/vnd.ms-excel';
-      fileName = `${document.number}_${document.date.replace(/\./g, '_')}.xlsx`;
+      fileName = `${doc.number}_${doc.date.replace(/\./g, '_')}.xlsx`;
     }
     
     const blob = new Blob([content], { type: mimeType });
@@ -211,7 +211,7 @@ startxref
     
     toast({
       title: "Файл скачан",
-      description: `Документ "${document.title}" успешно загружен`,
+      description: `Документ "${doc.title}" успешно загружен`,
     });
   };
   
@@ -281,22 +281,22 @@ startxref
           
           <div className="space-y-4">
             {DOCUMENTS.filter(doc => doc.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                     doc.number.toLowerCase().includes(searchQuery.toLowerCase())).map((document) => (
-              <div key={document.id} className="border rounded-md p-4 hover:bg-muted/50 transition-colors">
+                                     doc.number.toLowerCase().includes(searchQuery.toLowerCase())).map((doc) => (
+              <div key={doc.id} className="border rounded-md p-4 hover:bg-muted/50 transition-colors">
                 <div className="flex items-start gap-4">
                   <div className="bg-muted rounded-md p-2 hidden sm:flex">
                     <FileText className="h-6 w-6 text-solidus-steel-blue" />
                   </div>
                   <div className="flex-1">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-2">
-                      <h3 className="font-medium text-lg">{document.title}</h3>
+                      <h3 className="font-medium text-lg">{doc.title}</h3>
                       <div className="flex items-center gap-2 whitespace-nowrap">
                         <Badge variant="outline" className="font-normal">
-                          {document.category} № {document.number}
+                          {doc.category} № {doc.number}
                         </Badge>
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
                           <Calendar className="h-3 w-3" />
-                          <span>{document.date}</span>
+                          <span>{doc.date}</span>
                         </div>
                       </div>
                     </div>
@@ -305,7 +305,7 @@ startxref
                         variant="secondary" 
                         size="sm" 
                         className="flex items-center gap-2"
-                        onClick={() => handleViewDocument(document)}
+                        onClick={() => handleViewDocument(doc)}
                       >
                         <FileText className="h-4 w-4" />
                         <span>Просмотр</span>
@@ -314,10 +314,10 @@ startxref
                         variant="outline" 
                         size="sm" 
                         className="flex items-center gap-2"
-                        onClick={() => handleDownloadDocument(document)}
+                        onClick={() => handleDownloadDocument(doc)}
                       >
                         <Download className="h-4 w-4" />
-                        <span>Скачать {document.fileType.toUpperCase()}</span>
+                        <span>Скачать {doc.fileType.toUpperCase()}</span>
                       </Button>
                     </div>
                   </div>
