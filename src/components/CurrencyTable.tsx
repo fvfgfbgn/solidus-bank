@@ -10,19 +10,27 @@ export const CurrencyTable: React.FC = () => {
   const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
   const [isLoading, setIsLoading] = useState(false);
   const [isRealData, setIsRealData] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const currencyService = CurrencyService.getInstance();
 
   const loadCurrencies = async () => {
     setIsLoading(true);
+    setError(null);
     try {
+      console.log('Начинаем загрузку курсов валют...');
       const rates = await currencyService.getCurrentRates();
       setCurrencies(rates);
       setLastUpdateTime(new Date());
       setIsRealData(true);
+      console.log('Курсы валют успешно загружены и отображены');
     } catch (error) {
       console.error('Ошибка загрузки курсов:', error);
+      setError('Ошибка загрузки данных');
       setIsRealData(false);
+      // Показываем дефолтные данные в случае ошибки
+      const defaultRates = await currencyService.getCurrentRates();
+      setCurrencies(defaultRates);
     } finally {
       setIsLoading(false);
     }
@@ -44,6 +52,22 @@ export const CurrencyTable: React.FC = () => {
     second: "2-digit"
   });
 
+  if (currencies.length === 0 && isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Курсы валют</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <RefreshCw className="h-6 w-6 animate-spin mr-2" />
+            <span>Загрузка курсов валют...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -53,6 +77,7 @@ export const CurrencyTable: React.FC = () => {
             <span className="text-sm font-normal text-muted-foreground">
               Обновлено: {formattedTime}
               {isRealData && <span className="text-green-600 ml-1">(ЦБ РФ)</span>}
+              {error && <span className="text-orange-600 ml-1">(офлайн)</span>}
             </span>
             <Button
               variant="ghost"
@@ -99,7 +124,12 @@ export const CurrencyTable: React.FC = () => {
             </tbody>
           </table>
         </div>
-        {!isRealData && (
+        {error && (
+          <div className="mt-4 text-xs text-orange-600 text-center">
+            {error}. Отображаются резервные данные.
+          </div>
+        )}
+        {!isRealData && !error && (
           <div className="mt-4 text-xs text-orange-600 text-center">
             Данные могут быть неактуальными. Проверьте подключение к интернету.
           </div>
