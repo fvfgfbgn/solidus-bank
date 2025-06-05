@@ -32,7 +32,7 @@ export function MainNavigation() {
                 </div>
               </Link>
               <Link 
-                to="/management" 
+                to="/about/management" 
                 className="block select-none space-y-1 rounded-md p-3 hover:bg-accent"
               >
                 <div className="font-medium">Руководство</div>
@@ -41,7 +41,7 @@ export function MainNavigation() {
                 </div>
               </Link>
               <Link 
-                to="/structure" 
+                to="/about/structure" 
                 className="block select-none space-y-1 rounded-md p-3 hover:bg-accent"
               >
                 <div className="font-medium">Структура</div>
@@ -50,7 +50,7 @@ export function MainNavigation() {
                 </div>
               </Link>
               <Link 
-                to="/reports" 
+                to="/about/reports" 
                 className="block select-none space-y-1 rounded-md p-3 hover:bg-accent"
               >
                 <div className="font-medium">Годовые отчеты</div>
@@ -68,7 +68,7 @@ export function MainNavigation() {
           <NavigationMenuContent>
             <div className="grid w-[600px] grid-cols-2 gap-3 p-4">
               <Link 
-                to="/key-rate" 
+                to="/monetary-policy/key-rate" 
                 className="block select-none space-y-1 rounded-md p-3 hover:bg-accent"
               >
                 <div className="font-medium">Ключевая ставка</div>
@@ -77,7 +77,7 @@ export function MainNavigation() {
                 </div>
               </Link>
               <Link 
-                to="/inflation" 
+                to="/monetary-policy/inflation" 
                 className="block select-none space-y-1 rounded-md p-3 hover:bg-accent"
               >
                 <div className="font-medium">Инфляция</div>
@@ -95,7 +95,7 @@ export function MainNavigation() {
                 </div>
               </Link>
               <Link 
-                to="/forecasts" 
+                to="/monetary-policy/forecasts" 
                 className="block select-none space-y-1 rounded-md p-3 hover:bg-accent"
               >
                 <div className="font-medium">Прогнозы</div>
