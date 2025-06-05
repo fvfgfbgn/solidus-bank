@@ -25,6 +25,9 @@ import SecuritiesMarket from "./pages/markets/SecuritiesMarket";
 import BankingStats from "./pages/statistics/BankingStats";
 import FinancialStats from "./pages/statistics/FinancialStats";
 import MacroeconomicsStats from "./pages/statistics/MacroeconomicsStats";
+import CreditRates from "./pages/rates/CreditRates";
+import DepositRates from "./pages/rates/DepositRates";
+import MortgageRates from "./pages/rates/MortgageRates";
 import Regulations from "./pages/Regulations";
 import PressCenter from "./pages/PressCenter";
 import "./App.css";
@@ -60,6 +63,9 @@ function App() {
                   <Route path="/statistics/banking" element={<BankingStats />} />
                   <Route path="/statistics/financial" element={<FinancialStats />} />
                   <Route path="/statistics/macroeconomics" element={<MacroeconomicsStats />} />
+                  <Route path="/rates/credit" element={<CreditRates />} />
+                  <Route path="/rates/deposits" element={<DepositRates />} />
+                  <Route path="/rates/mortgage" element={<MortgageRates />} />
                   <Route path="/regulations" element={<Regulations />} />
                   <Route path="/press-center" element={<PressCenter />} />
                   <Route path="*" element={<NotFound />} />
