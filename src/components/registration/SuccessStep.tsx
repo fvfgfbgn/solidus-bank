@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, ArrowRight } from "lucide-react";
+import { Building2, ArrowRight } from "lucide-react";
 import { RegistrationData } from "@/pages/Registration";
 import { Link } from "react-router-dom";
 
@@ -13,11 +13,11 @@ export const SuccessStep = ({ data }: SuccessStepProps) => {
   return (
     <div className="text-center space-y-6">
       <div className="flex justify-center">
-        <CheckCircle className="h-16 w-16 text-green-500" />
+        <Building2 className="h-16 w-16 text-blue-600" />
       </div>
 
       <div className="space-y-2">
-        <h2 className="text-2xl font-bold text-green-600">
+        <h2 className="text-2xl font-bold text-blue-600">
           Регистрация завершена!
         </h2>
         <p className="text-gray-600">
