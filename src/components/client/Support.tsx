@@ -54,7 +54,7 @@ export const Support = () => {
     setTimeout(() => {
       toast({
         title: "Обращение отправлено",
-        description: "Ваше обращение принято. Ответ придет на email в течение 24 часов.",
+        description: "Ваше обращение принято. Ответ придет на email в течение 30 минут.",
       });
       setSubject("");
       setMessage("");
@@ -201,7 +201,7 @@ export const Support = () => {
                     <span className="font-semibold">Email</span>
                   </div>
                   <p className="text-sm text-gray-600">support@solidusbank.ru</p>
-                  <p className="text-xs text-gray-500">Ответ в течение 24 часов</p>
+                  <p className="text-xs text-gray-500">Ответ в течение 30 минут</p>
                 </Card>
               </div>
             </CardContent>
@@ -257,7 +257,7 @@ export const Support = () => {
                     )}
                   </Button>
                   <p className="text-xs text-gray-500">
-                    Ответ придет на email в течение 24 часов
+                    Ответ придет на email в течение 30 минут
                   </p>
                 </div>
               </form>
