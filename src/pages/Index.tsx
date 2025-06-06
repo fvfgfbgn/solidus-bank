@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MainNavigation } from "@/components/MainNavigation";
@@ -8,10 +7,43 @@ import { CurrencyTable } from "@/components/CurrencyTable";
 import { MarketAnalytics } from "@/components/MarketAnalytics";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Shield, Users, Building2, TrendingUp, Lock, UserCheck } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function Index() {
+  const [loginType, setLoginType] = useState<"admin" | "employee" | null>(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const success = await login(username, password);
+    if (success) {
+      setIsDialogOpen(false);
+      setUsername("");
+      setPassword("");
+      if (loginType === "admin") {
+        navigate("/admin");
+      } else if (loginType === "employee") {
+        navigate("/employee");
+      }
+    }
+  };
+
+  const openLoginDialog = (type: "admin" | "employee") => {
+    setLoginType(type);
+    setIsDialogOpen(true);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50">
       <Header />
@@ -57,18 +89,22 @@ export default function Index() {
               </p>
               
               <div className="space-y-3">
-                <Link to="/admin" className="block">
-                  <Button variant="outline" className="w-full border-white text-white hover:bg-white hover:text-slate-800">
-                    <Shield className="h-4 w-4 mr-2" />
-                    Админпанель
-                  </Button>
-                </Link>
-                <Link to="/employee" className="block">
-                  <Button variant="outline" className="w-full border-white text-white hover:bg-white hover:text-slate-800">
-                    <UserCheck className="h-4 w-4 mr-2" />
-                    Кабинет сотрудника
-                  </Button>
-                </Link>
+                <Button 
+                  variant="outline" 
+                  className="w-full border-white text-white hover:bg-white hover:text-slate-800"
+                  onClick={() => openLoginDialog("admin")}
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  Админпанель
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full border-white text-white hover:bg-white hover:text-slate-800"
+                  onClick={() => openLoginDialog("employee")}
+                >
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  Кабинет сотрудника
+                </Button>
               </div>
               
               <div className="mt-4 p-3 bg-blue-900/30 rounded text-xs">
@@ -80,6 +116,49 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* Login Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>
+              {loginType === "admin" ? "Вход для администратора" : "Вход для сотрудника"}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Имя пользователя</Label>
+              <Input
+                id="username"
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Введите имя пользователя"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Пароль</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Введите пароль"
+                required
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Отмена
+              </Button>
+              <Button type="submit">
+                Войти
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* Key Features */}
       <section className="py-16 bg-white">
