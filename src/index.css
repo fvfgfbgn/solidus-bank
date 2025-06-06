@@ -36,52 +36,40 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    /* Custom Solidus Bank colors */
-    --solidus-dark-slate: 180 13% 25%; /* #2F4F4F - dark slate gray */
-    --solidus-steel-blue: 207 44% 49%; /* #4682B4 - steel blue */
-    --solidus-platinum: 60 3% 89%;     /* #E5E4E2 - platinum */
+    /* Enhanced Solidus Bank colors with deep blue and platinum */
+    --solidus-deep-blue: 210 50% 15%;     /* #1e3a5f - deep navy blue */
+    --solidus-royal-blue: 210 60% 35%;    /* #2563eb - royal blue */
+    --solidus-steel-blue: 207 44% 49%;    /* #4682B4 - steel blue (existing) */
+    --solidus-platinum: 210 8% 92%;       /* #ebedef - platinum silver */
+    --solidus-light-platinum: 210 8% 96%; /* #f5f6f7 - light platinum */
+    --solidus-dark-slate: 210 13% 25%;    /* Updated to complement deep blue */
   }
 
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
-
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
-
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
-
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
@@ -94,10 +82,13 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    /* Custom Solidus Bank colors - dark mode */
-    --solidus-dark-slate: 180 13% 35%; /* Lighter for dark mode */
-    --solidus-steel-blue: 207 44% 60%; /* Brighter for dark mode */
-    --solidus-platinum: 60 3% 75%;     /* Darker for dark mode */
+    /* Dark mode variants */
+    --solidus-deep-blue: 210 50% 25%;
+    --solidus-royal-blue: 210 60% 45%;
+    --solidus-steel-blue: 207 44% 60%;
+    --solidus-platinum: 210 8% 20%;
+    --solidus-light-platinum: 210 8% 15%;
+    --solidus-dark-slate: 210 13% 35%;
   }
 }
 
@@ -112,24 +103,83 @@
 }
 
 @layer utilities {
-  /* Solidus brand gradient */
+  /* Enhanced Solidus brand gradients */
   .solidus-gradient {
-    background: linear-gradient(135deg, hsl(var(--solidus-dark-slate)) 0%, hsl(var(--solidus-steel-blue)) 100%);
+    background: linear-gradient(135deg, hsl(var(--solidus-deep-blue)) 0%, hsl(var(--solidus-royal-blue)) 50%, hsl(var(--solidus-steel-blue)) 100%);
   }
   
-  /* Animate fade in for components */
+  .solidus-gradient-light {
+    background: linear-gradient(135deg, hsl(var(--solidus-platinum)) 0%, hsl(var(--solidus-light-platinum)) 100%);
+  }
+  
+  .solidus-gradient-card {
+    background: linear-gradient(135deg, hsl(var(--solidus-light-platinum)) 0%, white 100%);
+  }
+  
+  /* Banking-themed background patterns */
+  .solidus-pattern {
+    background-image: 
+      radial-gradient(circle at 25% 25%, hsl(var(--solidus-steel-blue) / 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, hsl(var(--solidus-royal-blue) / 0.1) 0%, transparent 50%);
+  }
+  
+  /* Enhanced animations */
   .animate-fade-in {
-    animation: fadeIn 0.5s ease-out;
+    animation: fadeIn 0.6s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out;
   }
   
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(20px);
     }
     to {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Professional banking elements */
+  .bank-card-shadow {
+    box-shadow: 0 4px 20px hsl(var(--solidus-deep-blue) / 0.1);
+  }
+  
+  .bank-hover {
+    transition: all 0.3s ease;
+  }
+  
+  .bank-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px hsl(var(--solidus-royal-blue) / 0.15);
+  }
+}
+
+/* Custom utility classes for banking theme */
+@layer components {
+  .btn-solidus-primary {
+    @apply bg-gradient-to-r from-blue-700 to-blue-600 text-white hover:from-blue-800 hover:to-blue-700 transition-all duration-300;
+  }
+  
+  .btn-solidus-secondary {
+    @apply bg-gradient-to-r from-slate-100 to-slate-50 text-slate-800 hover:from-slate-200 hover:to-slate-100 border border-slate-300;
+  }
+  
+  .card-solidus {
+    @apply bg-white border border-slate-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300;
   }
 }

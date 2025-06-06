@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,15 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Enhanced Solidus Bank color palette
+				solidus: {
+					'deep-blue': 'hsl(var(--solidus-deep-blue))',
+					'royal-blue': 'hsl(var(--solidus-royal-blue))',
+					'steel-blue': 'hsl(var(--solidus-steel-blue))',
+					'platinum': 'hsl(var(--solidus-platinum))',
+					'light-platinum': 'hsl(var(--solidus-light-platinum))',
+					'dark-slate': 'hsl(var(--solidus-dark-slate))'
 				}
 			},
 			borderRadius: {
