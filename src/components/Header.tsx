@@ -2,14 +2,23 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X, Shield, UserCheck, Lock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Header: React.FC = () => {
   const location = useLocation();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, login } = useAuth();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [isServiceDialogOpen, setIsServiceDialogOpen] = useState(false);
+  const [loginType, setLoginType] = useState<"admin" | "employee" | null>(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogout = () => {
     logout();
@@ -21,6 +30,26 @@ export const Header: React.FC = () => {
 
   const closeDropdowns = () => {
     setOpenDropdown(null);
+  };
+
+  const handleServiceLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const success = await login(username, password);
+    if (success) {
+      setIsServiceDialogOpen(false);
+      setUsername("");
+      setPassword("");
+      if (loginType === "admin") {
+        navigate("/admin");
+      } else if (loginType === "employee") {
+        navigate("/employee");
+      }
+    }
+  };
+
+  const openServiceDialog = (type: "admin" | "employee") => {
+    setLoginType(type);
+    setIsServiceDialogOpen(true);
   };
 
   return (
@@ -251,16 +280,86 @@ export const Header: React.FC = () => {
               </div>
             ) : (
               <div className="flex items-center space-x-2">
-                <Link to="/registration">
-                  <Button variant="outline" size="sm">
-                    Войти
-                  </Button>
-                </Link>
-                <Link to="/registration">
-                  <Button size="sm">
-                    Регистрация
-                  </Button>
-                </Link>
+                <Dialog open={isServiceDialogOpen} onOpenChange={setIsServiceDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Lock className="h-4 w-4 mr-1" />
+                      Служебный вход
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Служебный доступ</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <Button 
+                          variant="outline"
+                          onClick={() => openServiceDialog("admin")}
+                          className="flex items-center justify-center"
+                        >
+                          <Shield className="h-4 w-4 mr-2" />
+                          Админ
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          onClick={() => openServiceDialog("employee")}
+                          className="flex items-center justify-center"
+                        >
+                          <UserCheck className="h-4 w-4 mr-2" />
+                          Сотрудник
+                        </Button>
+                      </div>
+                      
+                      {loginType && (
+                        <form onSubmit={handleServiceLogin} className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="username">Имя пользователя</Label>
+                            <Input
+                              id="username"
+                              type="text"
+                              value={username}
+                              onChange={(e) => setUsername(e.target.value)}
+                              placeholder="Введите имя пользователя"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="password">Пароль</Label>
+                            <Input
+                              id="password"
+                              type="password"
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder="Введите пароль"
+                              required
+                            />
+                          </div>
+                          <div className="flex justify-end space-x-2">
+                            <Button type="button" variant="outline" onClick={() => {
+                              setLoginType(null);
+                              setUsername("");
+                              setPassword("");
+                            }}>
+                              Назад
+                            </Button>
+                            <Button type="submit">
+                              Войти как {loginType === "admin" ? "администратор" : "сотрудник"}
+                            </Button>
+                          </div>
+                        </form>
+                      )}
+                      
+                      {!loginType && (
+                        <div className="mt-4 p-3 bg-blue-50 rounded text-xs">
+                          <p className="font-medium mb-1">Тестовые данные для входа:</p>
+                          <p>Админ: admin / 0000</p>
+                          <p>Сотрудник: employee1 / password</p>
+                        </div>
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             )}
 
