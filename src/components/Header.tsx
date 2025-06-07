@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -322,9 +321,9 @@ export const Header: React.FC = () => {
 
             {/* Прямые ссылки */}
             <Link
-              to="/press"
+              to="/press-center"
               className={`text-sm font-medium transition-colors ${
-                location.pathname === "/press" 
+                location.pathname === "/press-center" 
                   ? "text-solidus-steel-blue" 
                   : "text-gray-700 hover:text-solidus-steel-blue"
               }`}
@@ -511,7 +510,7 @@ export const Header: React.FC = () => {
                 Статистика
               </Link>
               <Link
-                to="/press"
+                to="/press-center"
                 className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
