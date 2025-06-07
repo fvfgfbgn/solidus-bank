@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -19,13 +19,30 @@ export const Header: React.FC = () => {
   const [loginType, setLoginType] = useState<"admin" | "employee" | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  
+  // Refs for hover delay
+  const currencyRef = useRef<HTMLDivElement>(null);
+  const ratesRef = useRef<HTMLDivElement>(null);
+  const analyticsRef = useRef<HTMLDivElement>(null);
+  const otherRef = useRef<HTMLDivElement>(null);
+  
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const handleLogout = () => {
     logout();
   };
 
-  const toggleDropdown = (dropdown: string) => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  const handleMouseEnter = (dropdown: string) => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+    }
+    setOpenDropdown(dropdown);
+  };
+
+  const handleMouseLeave = () => {
+    hoverTimeoutRef.current = setTimeout(() => {
+      setOpenDropdown(null);
+    }, 200); // 200ms delay before closing
   };
 
   const closeDropdowns = () => {
@@ -52,6 +69,15 @@ export const Header: React.FC = () => {
     setIsServiceDialogOpen(true);
   };
 
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
       <div className="container mx-auto px-4">
@@ -75,9 +101,13 @@ export const Header: React.FC = () => {
             </Link>
 
             {/* Курсы валют */}
-            <div className="relative">
+            <div 
+              className="relative"
+              ref={currencyRef}
+              onMouseEnter={() => handleMouseEnter('currency')}
+              onMouseLeave={handleMouseLeave}
+            >
               <button
-                onClick={() => toggleDropdown('currency')}
                 className={`text-sm font-medium transition-colors flex items-center gap-1 ${
                   location.pathname.includes('/currency') || location.pathname.includes('/markets')
                     ? "text-solidus-steel-blue" 
@@ -88,7 +118,11 @@ export const Header: React.FC = () => {
                 <ChevronDown className="h-4 w-4" />
               </button>
               {openDropdown === 'currency' && (
-                <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10">
+                <div 
+                  className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10"
+                  onMouseEnter={() => handleMouseEnter('currency')}
+                  onMouseLeave={handleMouseLeave}
+                >
                   <div className="py-2">
                     <Link
                       to="/markets/currency"
@@ -117,11 +151,15 @@ export const Header: React.FC = () => {
             </div>
 
             {/* Ставки */}
-            <div className="relative">
+            <div 
+              className="relative"
+              ref={ratesRef}
+              onMouseEnter={() => handleMouseEnter('rates')}
+              onMouseLeave={handleMouseLeave}
+            >
               <button
-                onClick={() => toggleDropdown('rates')}
                 className={`text-sm font-medium transition-colors flex items-center gap-1 ${
-                  location.pathname.includes('/monetary')
+                  location.pathname.includes('/monetary') || location.pathname.includes('/rates')
                     ? "text-solidus-steel-blue" 
                     : "text-gray-700 hover:text-solidus-steel-blue"
                 }`}
@@ -130,7 +168,11 @@ export const Header: React.FC = () => {
                 <ChevronDown className="h-4 w-4" />
               </button>
               {openDropdown === 'rates' && (
-                <div className="absolute top-full left-0 mt-1 w-56 bg-white border rounded-md shadow-lg z-10">
+                <div 
+                  className="absolute top-full left-0 mt-1 w-56 bg-white border rounded-md shadow-lg z-10"
+                  onMouseEnter={() => handleMouseEnter('rates')}
+                  onMouseLeave={handleMouseLeave}
+                >
                   <div className="py-2">
                     <Link
                       to="/monetary/key-rate"
@@ -166,9 +208,13 @@ export const Header: React.FC = () => {
             </div>
 
             {/* Аналитика */}
-            <div className="relative">
+            <div 
+              className="relative"
+              ref={analyticsRef}
+              onMouseEnter={() => handleMouseEnter('analytics')}
+              onMouseLeave={handleMouseLeave}
+            >
               <button
-                onClick={() => toggleDropdown('analytics')}
                 className={`text-sm font-medium transition-colors flex items-center gap-1 ${
                   location.pathname.includes('/statistics') || location.pathname.includes('/analytics')
                     ? "text-solidus-steel-blue" 
@@ -179,7 +225,11 @@ export const Header: React.FC = () => {
                 <ChevronDown className="h-4 w-4" />
               </button>
               {openDropdown === 'analytics' && (
-                <div className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10">
+                <div 
+                  className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10"
+                  onMouseEnter={() => handleMouseEnter('analytics')}
+                  onMouseLeave={handleMouseLeave}
+                >
                   <div className="py-2">
                     <Link
                       to="/statistics/banking"
@@ -208,16 +258,24 @@ export const Header: React.FC = () => {
             </div>
 
             {/* Другие разделы */}
-            <div className="relative">
+            <div 
+              className="relative"
+              ref={otherRef}
+              onMouseEnter={() => handleMouseEnter('other')}
+              onMouseLeave={handleMouseLeave}
+            >
               <button
-                onClick={() => toggleDropdown('other')}
                 className="text-sm font-medium text-gray-700 hover:text-solidus-steel-blue transition-colors flex items-center gap-1"
               >
                 Еще
                 <ChevronDown className="h-4 w-4" />
               </button>
               {openDropdown === 'other' && (
-                <div className="absolute top-full left-0 mt-1 w-56 bg-white border rounded-md shadow-lg z-10">
+                <div 
+                  className="absolute top-full left-0 mt-1 w-56 bg-white border rounded-md shadow-lg z-10"
+                  onMouseEnter={() => handleMouseEnter('other')}
+                  onMouseLeave={handleMouseLeave}
+                >
                   <div className="py-2">
                     <Link
                       to="/about"
