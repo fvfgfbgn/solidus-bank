@@ -21,10 +21,10 @@ export const Header: React.FC = () => {
   const [password, setPassword] = useState("");
   
   // Refs for hover delay
-  const currencyRef = useRef<HTMLDivElement>(null);
-  const ratesRef = useRef<HTMLDivElement>(null);
-  const analyticsRef = useRef<HTMLDivElement>(null);
-  const otherRef = useRef<HTMLDivElement>(null);
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const monetaryRef = useRef<HTMLDivElement>(null);
+  const marketsRef = useRef<HTMLDivElement>(null);
+  const statisticsRef = useRef<HTMLDivElement>(null);
   
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -42,7 +42,7 @@ export const Header: React.FC = () => {
   const handleMouseLeave = () => {
     hoverTimeoutRef.current = setTimeout(() => {
       setOpenDropdown(null);
-    }, 200); // 200ms delay before closing
+    }, 800); // Увеличил задержку до 800ms для удобства
   };
 
   const closeDropdowns = () => {
@@ -100,208 +100,248 @@ export const Header: React.FC = () => {
               Главная
             </Link>
 
-            {/* Курсы валют */}
+            {/* О банке */}
             <div 
               className="relative"
-              ref={currencyRef}
-              onMouseEnter={() => handleMouseEnter('currency')}
+              ref={aboutRef}
+              onMouseEnter={() => handleMouseEnter('about')}
               onMouseLeave={handleMouseLeave}
             >
               <button
-                className={`text-sm font-medium transition-colors flex items-center gap-1 ${
-                  location.pathname.includes('/currency') || location.pathname.includes('/markets')
+                className={`text-sm font-medium transition-colors flex items-center gap-1 py-2 ${
+                  location.pathname.includes('/about')
                     ? "text-solidus-steel-blue" 
                     : "text-gray-700 hover:text-solidus-steel-blue"
                 }`}
               >
-                Курсы валют
+                О банке
                 <ChevronDown className="h-4 w-4" />
               </button>
-              {openDropdown === 'currency' && (
+              {openDropdown === 'about' && (
                 <div 
-                  className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10"
-                  onMouseEnter={() => handleMouseEnter('currency')}
+                  className="absolute top-full left-0 mt-1 w-80 bg-white border rounded-md shadow-xl z-50 py-3"
+                  onMouseEnter={() => handleMouseEnter('about')}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <div className="py-2">
-                    <Link
-                      to="/markets/currency"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Валютный рынок
-                    </Link>
-                    <Link
-                      to="/markets/securities"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Рынок ценных бумаг
-                    </Link>
-                    <Link
-                      to="/markets/interbank"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Межбанковский рынок
-                    </Link>
-                  </div>
+                  <Link
+                    to="/about"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">История банка</div>
+                    <div className="text-sm text-gray-500 mt-1">Основные этапы развития</div>
+                  </Link>
+                  <Link
+                    to="/about/management"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Руководство</div>
+                    <div className="text-sm text-gray-500 mt-1">Руководящий состав</div>
+                  </Link>
+                  <Link
+                    to="/about/structure"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Структура</div>
+                    <div className="text-sm text-gray-500 mt-1">Организационная структура</div>
+                  </Link>
+                  <Link
+                    to="/about/reports"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Годовые отчеты</div>
+                    <div className="text-sm text-gray-500 mt-1">Финансовая отчетность</div>
+                  </Link>
                 </div>
               )}
             </div>
 
-            {/* Ставки */}
+            {/* Денежно-кредитная политика */}
             <div 
               className="relative"
-              ref={ratesRef}
-              onMouseEnter={() => handleMouseEnter('rates')}
+              ref={monetaryRef}
+              onMouseEnter={() => handleMouseEnter('monetary')}
               onMouseLeave={handleMouseLeave}
             >
               <button
-                className={`text-sm font-medium transition-colors flex items-center gap-1 ${
-                  location.pathname.includes('/monetary') || location.pathname.includes('/rates')
+                className={`text-sm font-medium transition-colors flex items-center gap-1 py-2 ${
+                  location.pathname.includes('/monetary')
                     ? "text-solidus-steel-blue" 
                     : "text-gray-700 hover:text-solidus-steel-blue"
                 }`}
               >
-                Ставки
+                Денежно-кредитная политика
                 <ChevronDown className="h-4 w-4" />
               </button>
-              {openDropdown === 'rates' && (
+              {openDropdown === 'monetary' && (
                 <div 
-                  className="absolute top-full left-0 mt-1 w-56 bg-white border rounded-md shadow-lg z-10"
-                  onMouseEnter={() => handleMouseEnter('rates')}
+                  className="absolute top-full left-0 mt-1 w-80 bg-white border rounded-md shadow-xl z-50 py-3"
+                  onMouseEnter={() => handleMouseEnter('monetary')}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <div className="py-2">
-                    <Link
-                      to="/monetary/key-rate"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Ключевая ставка
-                    </Link>
-                    <Link
-                      to="/monetary/policy"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Денежно-кредитная политика
-                    </Link>
-                    <Link
-                      to="/monetary/inflation"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Инфляция
-                    </Link>
-                    <Link
-                      to="/monetary/forecasts"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Прогнозы
-                    </Link>
-                  </div>
+                  <Link
+                    to="/monetary/key-rate"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Ключевая ставка</div>
+                    <div className="text-sm text-gray-500 mt-1">Текущая ключевая ставка</div>
+                  </Link>
+                  <Link
+                    to="/monetary/policy"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Политика и инструменты</div>
+                    <div className="text-sm text-gray-500 mt-1">Инструменты ДКП</div>
+                  </Link>
+                  <Link
+                    to="/monetary/inflation"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Инфляция</div>
+                    <div className="text-sm text-gray-500 mt-1">Динамика инфляции</div>
+                  </Link>
+                  <Link
+                    to="/monetary/forecasts"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Прогнозы</div>
+                    <div className="text-sm text-gray-500 mt-1">Экономические прогнозы</div>
+                  </Link>
                 </div>
               )}
             </div>
 
-            {/* Аналитика */}
+            {/* Финансовые рынки */}
             <div 
               className="relative"
-              ref={analyticsRef}
-              onMouseEnter={() => handleMouseEnter('analytics')}
+              ref={marketsRef}
+              onMouseEnter={() => handleMouseEnter('markets')}
               onMouseLeave={handleMouseLeave}
             >
               <button
-                className={`text-sm font-medium transition-colors flex items-center gap-1 ${
-                  location.pathname.includes('/statistics') || location.pathname.includes('/analytics')
+                className={`text-sm font-medium transition-colors flex items-center gap-1 py-2 ${
+                  location.pathname.includes('/markets')
                     ? "text-solidus-steel-blue" 
                     : "text-gray-700 hover:text-solidus-steel-blue"
                 }`}
               >
-                Аналитика
+                Финансовые рынки
                 <ChevronDown className="h-4 w-4" />
               </button>
-              {openDropdown === 'analytics' && (
+              {openDropdown === 'markets' && (
                 <div 
-                  className="absolute top-full left-0 mt-1 w-64 bg-white border rounded-md shadow-lg z-10"
-                  onMouseEnter={() => handleMouseEnter('analytics')}
+                  className="absolute top-full left-0 mt-1 w-80 bg-white border rounded-md shadow-xl z-50 py-3"
+                  onMouseEnter={() => handleMouseEnter('markets')}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <div className="py-2">
-                    <Link
-                      to="/statistics/banking"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Банковская статистика
-                    </Link>
-                    <Link
-                      to="/statistics/macroeconomics"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Макроэкономическая статистика
-                    </Link>
-                    <Link
-                      to="/statistics/financial"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Финансовая статистика
-                    </Link>
-                  </div>
+                  <Link
+                    to="/markets/currency"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Валютный рынок</div>
+                    <div className="text-sm text-gray-500 mt-1">Курсы валют</div>
+                  </Link>
+                  <Link
+                    to="/markets/securities"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Рынок ценных бумаг</div>
+                    <div className="text-sm text-gray-500 mt-1">Ценные бумаги</div>
+                  </Link>
+                  <Link
+                    to="/markets/interbank"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Межбанковский рынок</div>
+                    <div className="text-sm text-gray-500 mt-1">Межбанковские операции</div>
+                  </Link>
                 </div>
               )}
             </div>
 
-            {/* Другие разделы */}
+            {/* Статистика */}
             <div 
               className="relative"
-              ref={otherRef}
-              onMouseEnter={() => handleMouseEnter('other')}
+              ref={statisticsRef}
+              onMouseEnter={() => handleMouseEnter('statistics')}
               onMouseLeave={handleMouseLeave}
             >
               <button
-                className="text-sm font-medium text-gray-700 hover:text-solidus-steel-blue transition-colors flex items-center gap-1"
+                className={`text-sm font-medium transition-colors flex items-center gap-1 py-2 ${
+                  location.pathname.includes('/statistics')
+                    ? "text-solidus-steel-blue" 
+                    : "text-gray-700 hover:text-solidus-steel-blue"
+                }`}
               >
-                Еще
+                Статистика
                 <ChevronDown className="h-4 w-4" />
               </button>
-              {openDropdown === 'other' && (
+              {openDropdown === 'statistics' && (
                 <div 
-                  className="absolute top-full left-0 mt-1 w-56 bg-white border rounded-md shadow-lg z-10"
-                  onMouseEnter={() => handleMouseEnter('other')}
+                  className="absolute top-full left-0 mt-1 w-80 bg-white border rounded-md shadow-xl z-50 py-3"
+                  onMouseEnter={() => handleMouseEnter('statistics')}
                   onMouseLeave={handleMouseLeave}
                 >
-                  <div className="py-2">
-                    <Link
-                      to="/about"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      О банке
-                    </Link>
-                    <Link
-                      to="/regulations"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Нормативные документы
-                    </Link>
-                    <Link
-                      to="/press"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={closeDropdowns}
-                    >
-                      Пресс-центр
-                    </Link>
-                  </div>
+                  <Link
+                    to="/statistics/banking"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Банковская статистика</div>
+                    <div className="text-sm text-gray-500 mt-1">Данные банковского сектора</div>
+                  </Link>
+                  <Link
+                    to="/statistics/macroeconomics"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Макроэкономическая статистика</div>
+                    <div className="text-sm text-gray-500 mt-1">Макроэкономические показатели</div>
+                  </Link>
+                  <Link
+                    to="/statistics/financial"
+                    className="block px-6 py-3 text-base text-gray-700 hover:bg-gray-50 hover:text-solidus-steel-blue transition-colors"
+                    onClick={closeDropdowns}
+                  >
+                    <div className="font-medium">Финансовая статистика</div>
+                    <div className="text-sm text-gray-500 mt-1">Финансовые рынки</div>
+                  </Link>
                 </div>
               )}
             </div>
+
+            {/* Прямые ссылки */}
+            <Link
+              to="/press"
+              className={`text-sm font-medium transition-colors ${
+                location.pathname === "/press" 
+                  ? "text-solidus-steel-blue" 
+                  : "text-gray-700 hover:text-solidus-steel-blue"
+              }`}
+            >
+              Пресс-центр
+            </Link>
+
+            <Link
+              to="/regulations"
+              className={`text-sm font-medium transition-colors ${
+                location.pathname === "/regulations" 
+                  ? "text-solidus-steel-blue" 
+                  : "text-gray-700 hover:text-solidus-steel-blue"
+              }`}
+            >
+              Нормативные акты
+            </Link>
           </nav>
 
           {/* User Actions */}
@@ -443,32 +483,46 @@ export const Header: React.FC = () => {
                 Главная
               </Link>
               <Link
+                to="/about"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                О банке
+              </Link>
+              <Link
+                to="/monetary/policy"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Денежно-кредитная политика
+              </Link>
+              <Link
                 to="/markets/currency"
                 className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Курсы валют
-              </Link>
-              <Link
-                to="/monetary/key-rate"
-                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Ставки
+                Финансовые рынки
               </Link>
               <Link
                 to="/statistics/banking"
                 className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Аналитика
+                Статистика
               </Link>
               <Link
-                to="/about"
+                to="/press"
                 className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                О банке
+                Пресс-центр
+              </Link>
+              <Link
+                to="/regulations"
+                className="block px-4 py-2 text-sm font-medium text-gray-700 hover:text-solidus-steel-blue"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Нормативные акты
               </Link>
             </div>
           </div>
@@ -478,7 +532,7 @@ export const Header: React.FC = () => {
       {/* Overlay for dropdowns */}
       {openDropdown && (
         <div
-          className="fixed inset-0 z-5"
+          className="fixed inset-0 z-40"
           onClick={closeDropdowns}
         />
       )}
